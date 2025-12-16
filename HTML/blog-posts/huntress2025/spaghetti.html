@@ -2,15 +2,15 @@
 <html lang="en">
   <head>
     <!-- Favicon -->
-    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/favicon_ico/favicon.ico" type="image/x-icon" />
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Spaghetti - Untangling a Malicious PowerShell Dropper</title>
 
     <!-- Site CSS -->
-    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
-    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/blog.css" />
+    <link rel="stylesheet" href="/CSS/style.css" />
+    <link rel="stylesheet" href="/CSS/blog.css" />
 
     <!-- Prism (syntax highlighting) -->
     <link
@@ -66,13 +66,13 @@
       <nav class="navbar" aria-label="Primary">
         <div class="navbar-inner">
           <div class="logo">
-            <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+            <a href="/index.html">CYB3R4Y4</a>
           </div>
 
           <ul class="nav-links">
-            <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
-            <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
-            <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+            <li><a href="/blog.html">Blog</a></li>
+            <li><a href="/tags.html">Tags</a></li>
+            <li><a href="/categories.html">Categories</a></li>
             <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
           </ul>
 
@@ -99,7 +99,7 @@
           <div class="blog-meta-row">
             <span class="blog-meta-label">Category:</span>
             <a
-              href="/Cyb3Raya-Blog/categories.html#malware-analysis"
+              href="/categories.html#malware-analysis"
               class="tag-pill category-pill"
             >
               Malware Analysis / Reverse Engineering
@@ -108,12 +108,15 @@
 
           <p class="muted tags-line">
             Tags:
-            <a href="/Cyb3Raya-Blog/tags.html#huntress-ctf-2025" class="tag-pill"
+            <a href="/tags.html#huntress-ctf-2025" class="tag-pill"
               >Huntress CTF 2025</a
             >
-            <a href="/Cyb3Raya-Blog/tags.html#powershell" class="tag-pill">PowerShell</a>
-            <a href="/Cyb3Raya-Blog/tags.html#amsi-bypass" class="tag-pill">AMSI Bypass</a>
-            <a href="/Cyb3Raya-Blog/tags.html#defender-evasion" class="tag-pill">Defense Evasion</a>
+            <a href="/tags.html#powershell" class="tag-pill">PowerShell</a>
+            <a href="/tags.html#amsi-bypass" class="tag-pill">AMSI Bypass</a>
+            >
+            <a href="/tags.html#defender-evasion" class="tag-pill"
+              >Defense Evasion</a
+            >
           </p>
 
           <p class="muted">
@@ -124,7 +127,7 @@
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/punkps.jpg"
+              src="/Images/spaghetti/punkps.jpg"
               alt="Cyberpunk-themed image of a person coding on a laptop"
             />
             <figcaption>Image generated with Google Gemini</figcaption>
@@ -193,14 +196,14 @@
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/files.png"
+              src="/Images/spaghetti/files.png"
               alt="File type output for spaghetti and AYGIW.tmp"
             />
           </figure>
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/file-strings.png"
+              src="/Images/spaghetti/file-strings.png"
               alt="Strings output showing recognizable PowerShell content mixed with noise"
             />
           </figure>
@@ -330,14 +333,14 @@ ay.bin: MS-DOS executable</code></pre>
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/ps-script-contents.png"
+              src="/Images/spaghetti/ps-script-contents.png"
               alt="PowerShell script contents showing noisy code and variables"
             />
           </figure>
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/chall-clue.png"
+              src="/Images/spaghetti/chall-clue.png"
               alt="Challenge clue screenshot"
             />
           </figure>
@@ -375,7 +378,7 @@ ay.bin: MS-DOS executable</code></pre>
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/chef1.png"
+              src="/Images/spaghetti/chef1.png"
               alt="CyberChef recipe replacing ~ and % with 0 and 1"
             />
           </figure>
@@ -390,7 +393,7 @@ ay.bin: MS-DOS executable</code></pre>
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/chef2.png"
+              src="/Images/spaghetti/chef2.png"
               alt="CyberChef From Binary output showing decoded PowerShell text"
             />
           </figure>
@@ -416,7 +419,7 @@ ay.bin: MS-DOS executable</code></pre>
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/chef-html-output.png"
+              src="/Images/spaghetti/chef-html-output.png"
               alt="CyberChef output highlighting an HTML entity-encoded sequence"
             />
           </figure>
@@ -445,7 +448,7 @@ ay.bin: MS-DOS executable</code></pre>
 
           <figure>
             <img
-              src="/Cyb3Raya-Blog/Images/spaghetti/flag.png"
+              src="/Images/spaghetti/flag.png"
               alt="Flag hidden inside a commented Add-MpPreference exclusion line"
             />
           </figure>
@@ -618,7 +621,7 @@ ay.bin: MS-DOS executable</code></pre>
 
     <footer class="footer">
       <span>&copy; 2025 AJ Raya. All rights reserved.</span>
-      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+      <a href="/privacy.html">Privacy Policy</a>
     </footer>
 
     <!-- Theme toggle ( keyboard friendly) -->

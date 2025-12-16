@@ -1,0 +1,10 @@
+
+# Backups
+*.bak
+
+# Backup files
+*.bak
+
+# Local helper scripts
+fix_paths.py
+fix_pages_paths.py
