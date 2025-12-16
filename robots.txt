@@ -1,8 +1,4 @@
 User-agent: *
 Allow: /
 
-# Optional: keep low-value/internal pages out of search
-Disallow: /tags.html
-Disallow: /categories.html
-
 Sitemap: https://cyb3raya.com/sitemap.xml
