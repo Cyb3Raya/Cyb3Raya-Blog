@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spaghetti - Untangling a Malicious PowerShell Dropper</title>
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/blog.css" />
+
+    <!-- Prism (syntax highlighting) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A"
+      crossorigin="anonymous"
+    />
+
+    <!-- Font Awesome (icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+
+    <!-- Prism.js -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-06z5D//U/xpvxZHuUz92xBvq3DqBBFi7Up53HRrbV7Jlv7Yvh/MZ7oenfUe9iCEt"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-HkMr0bZB9kBW4iVtXn6nd35kO/L/dQtkkUBkL9swzTEDMdIe5ExJChVDSnC79aNA"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-powershell.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-xbI9krqyYp4npK9Cn94XyNoSR+TYZKddrk0NUVZ44zZ+OVpKz/LL0U1PB0MjR7Vx"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <!-- Accessibility -->
+    <!-- <a href="#content" class="skip-link">Skip to content</a> -->
+
+    <header>
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Primary">
+        <div class="navbar-inner">
+          <div class="logo">
+            <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+          </div>
+
+          <ul class="nav-links">
+            <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
+            <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
+            <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+            <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+          </ul>
+
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="content">
+      <section class="section">
+        <article class="post-container">
+          <h1>Spaghetti 🍝 - Untangling a Malicious PowerShell Dropper</h1>
+
+          <div class="post-meta">
+            <span class="author"><i class="fa-solid fa-user"></i> AJ Raya</span>
+            <span class="date"
+              ><i class="fa-solid fa-calendar"></i> October 2, 2025</span
+            >
+          </div>
+
+          <div class="blog-meta-row">
+            <span class="blog-meta-label">Category:</span>
+            <a
+              href="/Cyb3Raya-Blog/categories.html#malware-analysis"
+              class="tag-pill category-pill"
+            >
+              Malware Analysis / Reverse Engineering
+            </a>
+          </div>
+
+          <p class="muted tags-line">
+            Tags:
+            <a href="/Cyb3Raya-Blog/tags.html#huntress-ctf-2025" class="tag-pill"
+              >Huntress CTF 2025</a
+            >
+            <a href="/Cyb3Raya-Blog/tags.html#powershell" class="tag-pill">PowerShell</a>
+            <a href="/Cyb3Raya-Blog/tags.html#amsi-bypass" class="tag-pill">AMSI Bypass</a>
+            >
+            <a href="/Cyb3Raya-Blog/tags.html#defender-evasion" class="tag-pill"
+              >Defense Evasion</a
+            >
+          </p>
+
+          <p class="muted">
+            A chronological walkthrough of decoding the <code>spaghetti</code>
+            artifact, carving its embedded PE, and understanding the high-level
+            behavior of the final PowerShell payload.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/punkps.jpg"
+              alt="Cyberpunk-themed image of a person coding on a laptop"
+            />
+            <figcaption>Image generated with Google Gemini</figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>1. Goals &amp; Context</h2>
+          <p>
+            This challenge dropped a large, heavily obfuscated script called
+            <code>spaghetti</code> (a PowerShell dropper) plus a big binary blob
+            (<code>AYGIW.tmp</code> / <code>ay.bin</code>). The core objectives:
+          </p>
+          <ul>
+            <li>
+              Extract data encoded with a non-standard alphabet (for example,
+              <code>~</code>/<code>%</code> mapping to bits).
+            </li>
+            <li>
+              Decode that data to recover the embedded PowerShell payload(s) and
+              any flags.
+            </li>
+            <li>
+              Understand, at a high level, what the decoded payload does,
+              without documenting anything that would meaningfully enable
+              misuse.
+            </li>
+          </ul>
+          <p>
+            Everything below was done on an isolated analysis host for a
+            technical audience (reverse engineers / DFIR folks). I include the
+            commands that worked, what failed and why, and how we ultimately got
+            to readable script content.
+          </p>
+
+          <hr />
+
+          <h2>2. Tools Used</h2>
+          <p>For this analysis, I stuck to a pretty standard toolset:</p>
+          <ul>
+            <li><code>file</code>, <code>strings</code>, <code>wc</code></li>
+            <li><code>egrep</code>, <code>grep</code> / <code>rg</code></li>
+            <li><code>nl</code>, <code>sed</code>, <code>tr</code></li>
+            <li><code>xxd</code> (hex dump &amp; reverse)</li>
+            <li>Python 3 for ad-hoc decoding scripts</li>
+            <li>CyberChef for interactive decoding and sanity checks</li>
+            <li>
+              A text editor with line numbers for poking at
+              <code>spaghetti</code>
+            </li>
+          </ul>
+          <p>
+            Everything was done offline on a lab VM. No scripts were executed on
+            a production or Internet-connected host.
+          </p>
+
+          <hr />
+
+          <h2>3. First Look - File Type &amp; Strings</h2>
+          <p>
+            I started by running <code>file</code> and <code>strings</code> on
+            the two artifacts. The <code>spaghetti</code> file came back as
+            non-ISO extended ASCII but was clearly a PowerShell script with a
+            ton of extra noise.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/files.png"
+              alt="File type output for spaghetti and AYGIW.tmp"
+            />
+          </figure>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/file-strings.png"
+              alt="Strings output showing recognizable PowerShell content mixed with noise"
+            />
+          </figure>
+
+          <p>
+            A quick <code>strings</code> on the script showed a mix of
+            motivational quotes, math operations, and some PowerShell variables:
+          </p>
+
+          <pre><code class="language-bash">❯ strings spaghetti
+# The best way to predict the future is to create it. - Peter Drucker
+# Leadership is not about being in charge. It is about taking care of those in your charge. - Simon Sinek
+# Keep your face always toward the sunshine
+and shadows will fall behind you. - Walt Whitman
+# It is not length of life, but depth of life. - Ralph Waldo Emerson
+# The way to get started is to quit talking and begin doing. - Walt Disney
+# The only thing necessary for the triumph of evil is for good men to do nothing. - Edmund Burke
+# The way to get started is to quit talking and begin doing. - Walt Disney
+$ZHQVw = 24 * 70
+$ufoVC = $ZHQVw * 26
+$pqqkA = $ufoVC * 24
+Write-Host $pqqkA
+# I don't make mistakes. I make prophecies that immediately turn out to be wrong. - Murray Walker
+# You cannot shake hands with a clenched fist. - Indira Gandhi
+# The weak can never forgive. Forgiveness is the attribute of the strong. - Mahatma Gandhi
+# In three words I can sum up everything I
+ve learned about life: it goes on. - Robert Frost
+# Don't cry because it's over, smile because it happened. - Dr. Seuss
+# You cannot shake hands with a clenched fist. - Indira Gandhi
+# Believe you can and you're halfway there. - Theodore Roosevelt
+$shWFO = 65 - 5
+$gxeIV = $shWFO - 34
+$tGgSF = $gxeIV - 65
+Write-Host $tGgSF</code></pre>
+
+          <p>
+            We also confirmed the files were not tiny by using <code>wc</code> -
+            there was a lot of junk mixed in:
+          </p>
+
+          <pre><code class="language-bash">❯ wc -c AYGIW.tmp spaghetti
+1978370 AYGIW.tmp
+242850 spaghetti
+2221220 total</code></pre>
+
+          <p>
+            So: lots of filler in <code>spaghetti</code>, but still clearly
+            PowerShell under the hood, and subtle hints buried in the noise.
+          </p>
+
+          <hr />
+
+          <h2>4. Carving the Embedded PE from AYGIW.tmp</h2>
+          <p>
+            The next step was to figure out what <code>AYGIW.tmp</code> actually
+            contained. A quick hex dump showed something very familiar.
+          </p>
+
+          <p>
+            Using <code>xxd</code> on the first 256 bytes and piping through
+            <code>sed</code> made the structure obvious, including the magic
+            bytes for a Windows PE (<code>4D 5A</code>, i.e., <code>MZ</code>):
+          </p>
+
+          <pre><code class="language-bash">❯ xxd -l 256 AYGIW.tmp | sed -n '1,120p'
+00000000: 3444 3541 3957 5457 5433 5754 5754 5754  4D5A9WTWT3WTWTWT
+00000010: 3034 5754 5754 5754 4646 4646 5754 5754  04WTWTWTFFFFWTWT
+00000020: 4238 5754 5754 5754 5754 5754 5754 5754  B8WTWTWTWTWTWTWT
+00000030: 3457 5457 5457 5457 5457 5457 5457 5457  4WTWTWTWTWTWTWTW
+00000040: 5457 5457 5457 5457 5457 5457 5457 5457  TWTWTWTWTWTWTWTW
+...
+00000080: 3045 3146 4241 3045 5754 4234 3039 4344  0E1FBA0EWTB409CD
+00000090: 3231 4238 3031 3443 4344 3231 3534 3638  21B8014CCD215468
+000000a0: 3639 3733 3230 3730 3732 3646 3637 3732  69732070726F6772
+000000b0: 3631 3644 3230 3633 3631 364E 364E 364F  616D2063616E6E6F
+000000c0: 3734 3230 3632 3635 3230 3732 3735 364E  742062652072756E
+000000d0: 3230 3639 364E 3230 3434 344F 3533 3230  20696E20444F5320
+000000e0: 364D 364F 3634 3635 324E 304D 304D 3041  6D6F64652E0D0D0A</code></pre>
+
+          <p>
+            The file contained tons of non-hex junk characters, so I stripped
+            everything except hex and reconstructed a clean binary:
+          </p>
+
+          <pre><code class="language-bash">❯ tr -d '\r\n' &lt; AYGIW.tmp | tr -cd '0-9A-Fa-f' &gt; ay_clean.hex
+❯ xxd -r -p ay_clean.hex ay.bin
+❯ file ay.bin
+ay.bin: MS-DOS executable</code></pre>
+
+          <p>
+            Running <code>strings</code> with a minimum length of 6 characters
+            confirmed typical PE sections and data:
+          </p>
+
+          <pre><code class="language-bash">❯ strings -n 6 ay.bin | sed -n '1,120p'
+!This program cannot be run in DOS mode.
+~AbR~I
+~AbE~Q
+~RichH
+ `.rdata
+@@.dataD]
+.tls  w
+.gfids2
+@@.rsrc
+@@.reloc</code></pre>
+
+          <p>To hunt for CTF markers, I grepped for flag-style patterns:</p>
+
+          <pre><code class="language-bash">❯ strings -n 6 ay.bin | grep -iEn "flag" || true
+565:flag{39544d3b5374ebf7d39b8c260fc4afd8}</code></pre>
+
+          <p>
+            That gave us our first flag straight out of the carved PE:
+            <code>flag{39544d3b5374ebf7d39b8c260fc4afd8}</code>.
+          </p>
+
+          <hr />
+
+          <h2>5. Hunting the Bit-Blob Inside spaghetti</h2>
+          <p>
+            The next step was to get more out of the original
+            <code>spaghetti</code> script itself. While scrolling through it
+            with line numbers, a suspicious blob showed up around line 3501 in a
+            variable named <code>$MyOasis4</code>. This was clearly what the
+            clue was asking for in the challenge.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/ps-script-contents.png"
+              alt="PowerShell script contents showing noisy code and variables"
+            />
+          </figure>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/chall-clue.png"
+              alt="Challenge clue screenshot"
+            />
+          </figure>
+
+          <p>
+            The relevant chunk looked like this (heavily truncated here for
+            brevity):
+          </p>
+
+          <pre><code class="language-bash">3499    $MG5X.$x1ct($null,[object[]] ($Path3.Replace("%%",""),$WULC4));
+3500
+3501    $MyOasis4 = (FonatozQZ("~%%%~~%%~%%%~%~~~%%~~~~%~%%%~~%~~%%%~%~~~~%~%%~%~%%%~~%%~%%~%%~~~%%~~%~%~%%~~%~%~%%%~~~~~~%~~~~~~~%%~~%~~~%%~~%%~~~~%~%~~~%~~~%%~~%~~~~~~%~~~%~~~%%~%~~%~%%%~~%%~%%~~~~%~%%~~~%~~%%~%%~~~%%~~%~%~~%~~~~~~%~%~~%%~%%~~~%%~%%%~~%~~%%~%~~%~%%%~~~~~%%%~%~~~~%~~~~~~%~~%%~~~%%~%%%%~%%~~%%%~%%~~%%%~%%~%~~%~%%~%%%~~%%~~%%%~~%%%~%~~~~~%~%~~~%~~%~~~%%%~~%%~%%~~%~%~%%%~%~~~%%%~%~~~%%~%~~%~%%~%%%~~%%~~%%%~%%%~~%%~~%~~~~~~~%%%%~%~~%~~~~~~%~%%~%%~%~%~~%~~%%~~%~%~%%~~%%~~%~%%%~%~~%~%%%~~%~~~~~%~%%%~~%%~%%%~~%%~%%~~%~%~%%~%%~%~%%~~~%~~%%~%%~~~%%%%~~%~~%~%%%~~%~~~%%%~%%~~%~%~%%%~%~~~%~%~%~~~%%%%~~%~%%%~~~~~%%~~%~%~~%~%~~~~~%~~~%~~%~%~~%%~%%%%~~%~%%%~~%%~%%%~%~~~%%~~%~%~%%~%%~%~~%~%%%~~%~~%%~%~%%~~~~%~%%~%%%~~%%~~~~%~%%~~%%%~%%~~%~%~%%~%%~%~%%~~%~%~%%~%%%~~%%%~%~~~~%~%%%~~%~~~~~%~%%%~%~%~%%%~%~~~%%~%%%%~%%~%%~%~%%~~~~%~%%%~%
+...
+%~~~~%~~~~~~~%%~%%~~~%~%~~%~~~~%~%~".Replace('~','0').Replace('%','1')))</code></pre>
+
+          <p>
+            The key clue is at the very end:
+            <code>.Replace('~','0').Replace('%','1')</code>. The script
+            literally tells us how to interpret the alphabet: <code>~</code> is
+            <code>0</code>, and <code>%</code> is <code>1</code>.
+          </p>
+
+          <hr />
+
+          <h2>6. Decoding the Bit-Blob with CyberChef</h2>
+          <p>
+            To quickly validate the idea, I copied the entire blob (everything
+            between the quotes) into CyberChef and used a simple Find / Replace
+            recipe:
+          </p>
+          <ul>
+            <li>Replace all <code>~</code> with <code>0</code></li>
+            <li>Replace all <code>%</code> with <code>1</code></li>
+          </ul>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/chef1.png"
+              alt="CyberChef recipe replacing ~ and % with 0 and 1"
+            />
+          </figure>
+
+          <p>
+            That gave a long binary string. From there, I used CyberChef again
+            to convert from binary to text, grouping 8 bits at a time:
+          </p>
+          <ol>
+            <li>From Binary (8 bits)</li>
+          </ol>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/chef2.png"
+              alt="CyberChef From Binary output showing decoded PowerShell text"
+            />
+          </figure>
+
+          <p>
+            The output was now readable PowerShell code - confirming the stage
+            and the pipeline:
+          </p>
+
+          <pre><code class="language-bash">bitstring(~,%)
+  --&gt; replace(~,0)
+  --&gt; replace(%,1)
+  --&gt; binary to bytes
+  --&gt; decode as text (PowerShell)</code></pre>
+
+          <hr />
+
+          <h2>7. HTML-Encoded Flag and Second Stage Output</h2>
+          <p>
+            While reviewing the decoded PowerShell text, I noticed a suspicious
+            HTML-encoded sequence, a classic CTF text-hiding behavior:
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/chef-html-output.png"
+              alt="CyberChef output highlighting an HTML entity-encoded sequence"
+            />
+          </figure>
+
+          <pre><code class="language-markup">&amp;#102;&amp;#108;&amp;#97;&amp;#103;&amp;#123;&amp;#98;&amp;#51;&amp;#49;&amp;#51;&amp;#55;&amp;#57;&amp;#52;&amp;#100;&amp;#99;&amp;#101;&amp;#102;&amp;#51;&amp;#51;&amp;#53;&amp;#100;&amp;#97;&amp;#54;&amp;#50;&amp;#48;&amp;#54;&amp;#100;&amp;#53;&amp;#52;&amp;#97;&amp;#102;&amp;#56;&amp;#49;&amp;#98;&amp;#54;&amp;#50;&amp;#48;&amp;#51;&amp;#125;</code></pre>
+
+          <p>
+            Back in CyberChef, I pasted that HTML-entity string and used
+            <strong>From HTML Entity</strong>. The decoded result:
+          </p>
+
+          <pre><code class="language-bash">flag{b313794dcef335da6206d54af81b6203}</code></pre>
+
+          <p>
+            That gave us the next flag:
+            <code>flag{b313794dcef335da6206d54af81b6203}</code>.
+          </p>
+
+          <hr />
+
+          <h2>8. Final Flag - Hiding in Plain Sight</h2>
+          <p>
+            One more pass over the decoded PowerShell showed an exclusion
+            command in a comment:
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/spaghetti/flag.png"
+              alt="Flag hidden inside a commented Add-MpPreference exclusion line"
+            />
+          </figure>
+
+          <pre><code class="language-powershell"># Add-MpPreference -ExclusionExtension "flag{60814731f508781b9a5f8636c817af9d}"</code></pre>
+
+          <p>
+            This gave a third flag hiding in what looks like a Defender
+            exclusion line:
+            <code>flag{60814731f508781b9a5f8636c817af9d}</code>.
+          </p>
+
+          <hr />
+
+          <h2>9. What the Decoded Payload Does (High-Level)</h2>
+          <p>
+            At this point we have enough context to summarize core behaviors of
+            the decoded payload. I’m intentionally keeping this at a conceptual
+            level.
+          </p>
+
+          <ol>
+            <li>
+              <strong>PowerShell logging / diagnostics tampering</strong>
+              <ul>
+                <li>
+                  Inspects/manipulates internal PowerShell policy and logging
+                  structures.
+                </li>
+                <li>
+                  Targets script block logging and related diagnostics to reduce
+                  visibility.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>AMSI bypass attempts (multiple variants)</strong>
+              <ul>
+                <li>Uses .NET reflection to mark AMSI as “init failed”.</li>
+                <li>Patches <code>AmsiScanBuffer</code> in memory.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Defender tampering</strong>
+              <ul>
+                <li>Adds exclusions/tweaks preferences.</li>
+                <li>Attempts to reduce detection/blocking coverage.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>User / privilege manipulation</strong>
+              <ul>
+                <li>
+                  Creates a local user and adds admin/RDP group membership.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>Embedded flags</strong>
+              <ul>
+                <li>
+                  Multiple <code>flag{...}</code> markers appear in comments or
+                  encoded form.
+                </li>
+              </ul>
+            </li>
+          </ol>
+
+          <p>
+            Put simply: this dropper focuses on
+            <a
+              href="https://attack.mitre.org/tactics/TA0005/"
+              class="mitre-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+              >defense evasion</a
+            >
+            and
+            <a
+              href="https://attack.mitre.org/tactics/TA0003/"
+              class="mitre-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+              >persistence</a
+            >.
+          </p>
+
+          <hr />
+
+          <h2>10. Concrete Findings</h2>
+          <p>Across the layers, we recovered:</p>
+          <ul>
+            <li>
+              From the carved <code>ay.bin</code> PE:
+              <code>flag{39544d3b5374ebf7d39b8c260fc4afd8}</code>
+            </li>
+            <li>
+              From the decoded bit-blob and HTML entities:
+              <code>flag{b313794dcef335da6206d54af81b6203}</code>
+            </li>
+            <li>
+              From the commented Defender exclusion line:
+              <code>flag{60814731f508781b9a5f8636c817af9d}</code>
+            </li>
+          </ul>
+
+          <hr />
+
+          <h2>11. Safety, Handling &amp; Remediation (If This Were Real)</h2>
+          <p>
+            In a real environment (vs. a CTF), discovering a payload like this
+            would warrant a full incident response. At a high level:
+          </p>
+          <ul>
+            <li>Isolate the host (network quarantine / disconnect).</li>
+            <li>
+              Preserve forensic evidence (disk + memory image, plus relevant
+              logs).
+            </li>
+            <li>Do not execute the script on a live, production system.</li>
+            <li>
+              Use a sandbox or offline VM to analyze behavior in a controlled
+              way.
+            </li>
+            <li>
+              Reset credentials for any accounts the script may have touched.
+            </li>
+            <li>
+              Verify local admin + RDP group membership and hunt for
+              persistence.
+            </li>
+          </ul>
+
+          <hr />
+
+          <h2>12. Final Takeaways</h2>
+          <ul>
+            <li>
+              Don’t get intimidated by noise - look for transformation logic
+              (<code>.Replace()</code>, strange alphabets, helper functions).
+            </li>
+            <li>
+              A simple replace + binary-to-text pipeline can go a long way in
+              staged droppers.
+            </li>
+            <li>
+              Treat payloads as malicious until proven otherwise, especially
+              with AMSI bypass and Defender tampering patterns.
+            </li>
+          </ul>
+
+          <p>
+            In the end, we carved a PE, recovered multiple flags, and got a
+            clear picture of how the dropper tries to blind defenses and persist
+            on a host - without executing it.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <!-- Fullscreen image modal -->
+    <div class="image-modal" id="image-modal" aria-hidden="true">
+      <button class="image-modal-close" aria-label="Close image">
+        &times;
+      </button>
+      <img src="" alt="" />
+    </div>
+
+    <footer class="footer">
+      <span>&copy; 2025 AJ Raya. All rights reserved.</span>
+      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+    </footer>
+
+    <!-- Theme toggle ( keyboard friendly) -->
+    <script>
+      const themeToggle = document.querySelector(".theme-toggle");
+      const themeIcon = document.getElementById("theme-icon");
+      const storedTheme = localStorage.getItem("theme");
+
+      if (themeToggle && themeIcon) {
+        function enableDark() {
+          document.body.classList.add("dark-mode");
+          themeIcon.classList.replace("fa-sun", "fa-moon");
+        }
+
+        function enableLight() {
+          document.body.classList.remove("dark-mode");
+          themeIcon.classList.replace("fa-moon", "fa-sun");
+        }
+
+        if (
+          storedTheme === "dark" ||
+          (!storedTheme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          enableDark();
+        } else {
+          enableLight();
+        }
+
+        function toggleTheme() {
+          if (document.body.classList.contains("dark-mode")) {
+            enableLight();
+            localStorage.setItem("theme", "light");
+          } else {
+            enableDark();
+            localStorage.setItem("theme", "dark");
+          }
+        }
+
+        themeToggle.addEventListener("click", toggleTheme);
+        themeToggle.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleTheme();
+          }
+        });
+      }
+    </script>
+
+    <!-- Image click-to-zoom modal -->
+    <script>
+      (function () {
+        const modal = document.getElementById("image-modal");
+        if (!modal) return;
+
+        const modalImg = modal.querySelector("img");
+        const closeBtn = modal.querySelector(".image-modal-close");
+
+        function openModal(src, alt) {
+          modalImg.src = src;
+          modalImg.alt = alt || "";
+          modal.classList.add("open");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+          modal.classList.remove("open");
+          modal.setAttribute("aria-hidden", "true");
+          modalImg.src = "";
+          document.body.style.overflow = "";
+        }
+
+        document.querySelectorAll(".post-container img").forEach((img) => {
+          img.addEventListener("click", () => openModal(img.src, img.alt));
+        });
+
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target === closeBtn) closeModal();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.classList.contains("open"))
+            closeModal();
+        });
+      })();
+    </script>
+
+    <!-- Code block copy buttons -->
+    <script>
+      (function () {
+        const codeBlocks = document.querySelectorAll(
+          ".post-container pre > code"
+        );
+        if (!codeBlocks.length) return;
+
+        codeBlocks.forEach((code) => {
+          const pre = code.parentElement;
+          if (!pre) return;
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "code-copy-btn";
+          btn.innerHTML = `
+            <i class="fa-regular fa-clipboard"></i>
+            <span>Copy</span>
+          `;
+
+          btn.addEventListener("click", async () => {
+            const text = code.innerText || code.textContent || "";
+
+            const copy = async () => {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+              }
+
+              const textarea = document.createElement("textarea");
+              textarea.value = text;
+              textarea.style.position = "fixed";
+              textarea.style.left = "-9999px";
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+              } finally {
+                document.body.removeChild(textarea);
+              }
+            };
+
+            try {
+              await copy();
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-check"></i>
+                <span>Copied</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 1500);
+            } catch (err) {
+              console.error("Copy failed:", err);
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Error</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 2000);
+            }
+          });
+
+          pre.appendChild(btn);
+        });
+      })();
+    </script>
+  </body>
+</html>

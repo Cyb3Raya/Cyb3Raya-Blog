@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog - 2025</title>
+
+    <!-- Basic hardening for a static site -->
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <!-- Accessibility: lets keyboard users jump past the nav to main content -->
+    <!-- <a href="#content" class="skip-link">Skip to content</a> -->
+
+    <header>
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Primary">
+        <div class="navbar-inner">
+          <div class="logo">
+            <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+          </div>
+
+          <ul class="nav-links">
+            <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
+            <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
+            <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+            <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+          </ul>
+
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="content">
+      <section class="section year-archive">
+        <h1>Blog Posts - 2025</h1>
+        <p>A collection of my 2025 blog posts.</p>
+
+        <a
+          href="/Cyb3Raya-Blog/HTML/blog-posts/huntress2025/huntress-ctf-2025.html"
+          class="blog-card-link"
+        >
+          <div class="blog-post">
+            <div class="title-with-icon">
+              <img
+                src="/Cyb3Raya-Blog/Images/huntress.webp"
+                alt="Huntress Logo"
+                class="post-logo"
+              />
+              <h3>Huntress CTF 2025</h3>
+            </div>
+          </div>
+        </a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>&copy; 2025 AJ Raya. All rights reserved.</span>
+      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+    </footer>
+
+    <!-- Theme toggle script: localStorage only, no tracking/analytics -->
+    <script>
+      const themeIcon = document.getElementById("theme-icon");
+      const storedTheme = localStorage.getItem("theme");
+
+      function enableDark() {
+        document.body.classList.add("dark-mode");
+        themeIcon.classList.replace("fa-sun", "fa-moon");
+      }
+
+      function enableLight() {
+        document.body.classList.remove("dark-mode");
+        themeIcon.classList.replace("fa-moon", "fa-sun");
+      }
+
+      // Apply saved or system theme safely
+      if (themeIcon) {
+        if (
+          storedTheme === "dark" ||
+          (!storedTheme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          enableDark();
+        } else {
+          enableLight();
+        }
+      }
+
+      // Toggle theme on click (safe if icon is missing)
+      if (themeIcon) {
+        themeIcon.addEventListener("click", () => {
+          if (document.body.classList.contains("dark-mode")) {
+            enableLight();
+            localStorage.setItem("theme", "light");
+          } else {
+            enableDark();
+            localStorage.setItem("theme", "dark");
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

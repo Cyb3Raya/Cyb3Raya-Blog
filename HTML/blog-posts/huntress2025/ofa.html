@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>One-Factor Authentication - Challenge Write-Up</title>
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/blog.css" />
+
+    <!-- Prism (syntax highlighting) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A"
+      crossorigin="anonymous"
+    />
+
+    <!-- Font Awesome (icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+
+    <!-- Prism.js -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-06z5D//U/xpvxZHuUz92xBvq3DqBBFi7Up53HRrbV7Jlv7Yvh/MZ7oenfUe9iCEt"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-HkMr0bZB9kBW4iVtXn6nd35kO/L/dQtkkUBkL9swzTEDMdIe5ExJChVDSnC79aNA"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <!-- Accessibility -->
+    <!-- <a href="#content" class="skip-link">Skip to content</a> -->
+
+    <header>
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Primary">
+        <div class="navbar-inner">
+          <div class="logo">
+            <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+          </div>
+
+          <ul class="nav-links">
+            <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
+            <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
+            <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+            <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+          </ul>
+
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="content">
+      <section class="section">
+        <article class="post-container">
+          <h1>One-Factor Authentication 🔐 - CTF Challenge Write-Up</h1>
+
+          <div class="post-meta">
+            <span class="author"><i class="fa-solid fa-user"></i> AJ Raya</span>
+            <span class="date"
+              ><i class="fa-solid fa-calendar"></i> October 2, 2025</span
+            >
+          </div>
+
+          <div class="blog-meta-row">
+            <span class="blog-meta-label">Category:</span>
+            <a
+              href="/Cyb3Raya-Blog/categories.html#web-exploitation"
+              class="tag-pill category-pill"
+            >
+              Web Exploitation
+            </a>
+          </div>
+
+          <p class="muted tags-line">
+            Tags:
+            <a href="/Cyb3Raya-Blog/tags.html#huntress-ctf-2025" class="tag-pill"
+              >Huntress CTF 2025</a
+            >
+          </p>
+
+          <p class="muted">
+            "Times were hard, we couldn't afford the second factor."
+          </p>
+
+          <figure>
+            <img src="/Cyb3Raya-Blog/Images/ofa/ofa.jpg" alt="Cyberpunk-themed image" />
+            <figcaption>Image generated with Google Gemini</figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>1. Initial Recon - Inspecting the Web App</h2>
+          <p>
+            I started by opening the browser devtools and checking the elements,
+            console, and network tabs on the login page. Nothing obvious like
+            hidden fields, debug endpoints, or exposed flags were present.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/ofa/devtools.png"
+              alt="Developer tools inspection on the login page"
+            />
+            <figcaption>
+              No sensitive parameters or client-side secrets were visible.
+            </figcaption>
+          </figure>
+
+          <h3>Login Page HTML</h3>
+          <p>
+            Viewing the page source showed a simple login form with no obvious
+            vulnerabilities beyond standard username/password handling:
+          </p>
+
+          <pre><code class="language-markup">&lt;!doctype html&gt;
+&lt;html lang='en'&gt;
+  &lt;head&gt;
+    &lt;meta charset='utf-8'&gt;
+    &lt;meta name='viewport' content='width=device-width, initial-scale=1'&gt;
+    &lt;title&gt;One Factor Authentication&lt;/title&gt;
+    &lt;style&gt;
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#0b0f14; color:#e6f1ff; margin:0 }
+      main { max-width: 560px; margin: 3rem auto; padding: 1rem }
+      .card { background:#121821; padding:1rem; border-radius:14px }
+      input, button { padding:.6rem .8rem; border-radius:10px; border:1px solid #253140; background:#0e141c; color:#e6f1ff }
+      label { display:block; margin:.75rem 0 }
+      button { background:#4fd1c5; border:0; color:#062525; font-weight:700; cursor:pointer }
+      .flag { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:#0e141c; padding:.5rem .75rem; border-radius:10px; display:inline-block }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;main&gt;
+      &lt;h1&gt;One Factor Authentication&lt;/h1&gt;
+      &lt;p style="color:#90a4b8;margin-top:-.6rem"&gt;times were hard, we couldn't afford the second factor&lt;/p&gt;
+      &lt;div class="card"&gt;
+        &lt;h2&gt;Login&lt;/h2&gt;
+        &lt;form method='post' action='/Cyb3Raya-Blog/login'&gt;
+          &lt;label&gt;Username &lt;input name='username' autocomplete='username' required&gt;&lt;/label&gt;
+          &lt;label&gt;Password &lt;input name='password' type='password' autocomplete='current-password' required&gt;&lt;/label&gt;
+          &lt;button type='submit'&gt;Sign in&lt;/button&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+          <hr />
+
+          <h2>2. Checking robots.txt</h2>
+          <p>
+            As usual, I checked <code>/robots.txt</code> to see if the
+            application accidentally exposed anything interesting. In this case,
+            nothing useful was listed.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/ofa/robots.txt.png"
+              alt="robots.txt response showing no interesting entries"
+            />
+          </figure>
+
+          <hr />
+
+          <h2>3. Port Scanning - Rustscan and Nmap</h2>
+          <p>
+            Next, I scanned the target to see what services were exposed. I used
+            Rustscan as a fast front-end to Nmap:
+          </p>
+
+          <pre><code class="language-bash">rustscan -a 10.1.163.83</code></pre>
+
+          <p>Open ports discovered:</p>
+
+          <pre><code class="language-bash">22/tcp   open  ssh
+80/tcp   open  http
+5000/tcp open  upnp</code></pre>
+
+          <p>The Nmap output confirmed the same:</p>
+
+          <pre><code class="language-bash">Nmap scan report for 10.1.163.83
+PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+5000/tcp open  upnp</code></pre>
+
+          <hr />
+
+          <h2>4. Directory Brute Forcing with Gobuster</h2>
+          <p>
+            I ran Gobuster against the web root to look for hidden paths or
+            endpoints:
+          </p>
+
+          <pre><code class="language-bash">gobuster dir \
+  -u http://10.1.163.83 \
+  -w /home/user/Tools/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt \
+  -o gobuster.txt</code></pre>
+
+          <p>Key findings:</p>
+
+          <pre><code class="language-bash">/login      (Status: 200)
+/success    (Status: 302) [--&gt; /login]
+/verify     (Status: 302) [--&gt; /login]
+/otp        (Status: 302) [--&gt; /login]</code></pre>
+
+          <p>
+            The <code>/otp</code> endpoint stood out as likely related to the
+            one-time password mentioned in the challenge name.
+          </p>
+
+          <hr />
+
+          <h2>5. Hitting /otp and Inspecting the Session Cookie</h2>
+          <p>
+            When I visited <code>/otp</code> and looked at the response in the
+            browser devtools, a session cookie was set:
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/ofa/sessioncookiedevtools.png"
+              alt="Developer tools showing a session cookie set by the /otp endpoint"
+            />
+          </figure>
+
+          <p>
+            The cookie value looked like Base64, which is a common encoding used
+            to hide (but not securely protect) structured data.
+          </p>
+
+          <hr />
+
+          <h2>6. Decoding the Cookie and Extracting the OTP</h2>
+          <p>
+            I copied the cookie value and decoded it as Base64. This revealed
+            JSON-like data that actually contained the OTP in clear text.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/ofa/decodedcookie.png"
+              alt="Decoded Base64 cookie showing an OTP value"
+            />
+          </figure>
+
+          <p>
+            With the OTP in hand, I could complete the authentication flow and
+            was redirected to the success page where the flag was displayed:
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/ofa/flag.png"
+              alt="Success page displaying the CTF flag"
+            />
+          </figure>
+
+          <hr />
+
+          <h2>Final Flag</h2>
+          <pre><code class="language-bash">flag{013cb9b123afec26b572af5087364081}</code></pre>
+
+          <p>
+            The core issue here is that the OTP was stored directly in a session
+            cookie using only Base64 encoding. Encoding is not encryption -
+            anyone with access to the cookie can decode it and impersonate a
+            valid OTP.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <!-- Fullscreen image modal (used by blog.css) -->
+    <div class="image-modal" id="image-modal" aria-hidden="true">
+      <button class="image-modal-close" aria-label="Close image">
+        &times;
+      </button>
+      <img src="" alt="" />
+    </div>
+
+    <footer class="footer">
+      <span>&copy; 2025 AJ Raya. All rights reserved.</span>
+      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+    </footer>
+
+    <!-- Theme toggle -->
+    <script>
+      const themeIcon = document.getElementById("theme-icon");
+      const storedTheme = localStorage.getItem("theme");
+
+      function enableDark() {
+        document.body.classList.add("dark-mode");
+        themeIcon.classList.replace("fa-sun", "fa-moon");
+      }
+
+      function enableLight() {
+        document.body.classList.remove("dark-mode");
+        themeIcon.classList.replace("fa-moon", "fa-sun");
+      }
+
+      if (themeIcon) {
+        if (
+          storedTheme === "dark" ||
+          (!storedTheme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          enableDark();
+        } else {
+          enableLight();
+        }
+
+        themeIcon.addEventListener("click", () => {
+          if (document.body.classList.contains("dark-mode")) {
+            enableLight();
+            localStorage.setItem("theme", "light");
+          } else {
+            enableDark();
+            localStorage.setItem("theme", "dark");
+          }
+        });
+      }
+    </script>
+
+    <!-- Image click-to-zoom modal -->
+    <script>
+      (function () {
+        const modal = document.getElementById("image-modal");
+        if (!modal) return;
+
+        const modalImg = modal.querySelector("img");
+        const closeBtn = modal.querySelector(".image-modal-close");
+
+        function openModal(src, alt) {
+          modalImg.src = src;
+          modalImg.alt = alt || "";
+          modal.classList.add("open");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+          modal.classList.remove("open");
+          modal.setAttribute("aria-hidden", "true");
+          modalImg.src = "";
+          document.body.style.overflow = "";
+        }
+
+        document.querySelectorAll(".post-container img").forEach((img) => {
+          img.addEventListener("click", () => {
+            openModal(img.src, img.alt);
+          });
+        });
+
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target === closeBtn) {
+            closeModal();
+          }
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.classList.contains("open")) {
+            closeModal();
+          }
+        });
+      })();
+    </script>
+
+    <!-- Code block copy buttons -->
+    <script>
+      (function () {
+        const codeBlocks = document.querySelectorAll(
+          ".post-container pre > code"
+        );
+        if (!codeBlocks.length) return;
+
+        codeBlocks.forEach((code) => {
+          const pre = code.parentElement;
+          if (!pre) return;
+
+          // Create button
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "code-copy-btn";
+          btn.innerHTML = `
+            <i class="fa-regular fa-clipboard"></i>
+            <span>Copy</span>
+          `;
+
+          btn.addEventListener("click", async () => {
+            const text = code.innerText || code.textContent || "";
+
+            const copy = async () => {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+              }
+
+              const textarea = document.createElement("textarea");
+              textarea.value = text;
+              textarea.style.position = "fixed";
+              textarea.style.left = "-9999px";
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+              } finally {
+                document.body.removeChild(textarea);
+              }
+            };
+
+            try {
+              await copy();
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-check"></i>
+                <span>Copied</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 1500);
+            } catch (err) {
+              console.error("Copy failed:", err);
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Error</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 2000);
+            }
+          });
+
+          pre.appendChild(btn);
+        });
+      })();
+    </script>
+  </body>
+</html>

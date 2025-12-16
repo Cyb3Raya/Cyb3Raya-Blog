@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tabby's Date - Notepad TabState Forensics</title>
+
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/blog.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+
+    <!-- Prism.js -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      integrity="sha384-06z5D//U/xpvxZHuUz92xBvq3DqBBFi7Up53HRrbV7Jlv7Yvh/MZ7oenfUe9iCEt"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"
+      integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar" aria-label="Primary">
+      <div class="navbar-inner">
+        <div class="logo">
+          <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+        </div>
+
+        <ul class="nav-links">
+          <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
+          <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
+          <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+          <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+        </ul>
+
+        <button class="theme-toggle" aria-label="Toggle theme">
+          <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+          <span class="sr-only">Toggle theme</span>
+        </button>
+      </div>
+    </nav>
+
+    <main id="main">
+      <section class="section">
+        <article class="post-container">
+          <h1>Tabby's Date - Recovering an Unsaved Notepad Note 🗒️</h1>
+
+          <div class="post-meta">
+            <span class="author"><i class="fa-solid fa-user"></i> AJ Raya</span>
+            <span class="date"
+              ><i class="fa-solid fa-calendar"></i> October 9, 2025</span
+            >
+          </div>
+
+          <div class="blog-meta-row">
+            <span class="blog-meta-label">Category:</span>
+            <a href="/Cyb3Raya-Blog/categories.html#forensics" class="tag-pill category-pill">
+              Forensics
+            </a>
+          </div>
+
+          <p class="muted tags-line">
+            Tags:
+            <a href="/Cyb3Raya-Blog/tags.html#huntress-ctf-2025" class="tag-pill"
+              >Huntress CTF 2025</a
+            >
+            <a href="/Cyb3Raya-Blog/tags.html#windows" class="tag-pill">Windows</a>
+          </p>
+
+          <figure>
+            <img src="/Cyb3Raya-Blog/Images/tabby/tabby-guy.png" alt="Tabby character" />
+          </figure>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/tabby/chall-prompt.png"
+              alt="Tabby's Date challenge prompt"
+            />
+            <figcaption>
+              Challenge context: Tabby wrote something important in Notepad, but
+              never saved it.
+            </figcaption>
+          </figure>
+
+          <p>
+            <strong>Goal:</strong> find the note on Tabby's laptop that contains
+            the flag.
+          </p>
+
+          <p>
+            <strong>What we were given:</strong>
+            <code>tabbys_date.zip</code> (password: <code>tabbys_date</code>) –
+            an export of her <code>C:</code> drive.
+          </p>
+
+          <hr />
+
+          <h2>1. Unzip the archive</h2>
+
+          <pre><code class="language-bash">unzip tabbys_date.zip -d tabby_cdrive -P tabbys_date
+tree tabby_cdrive/
+</code></pre>
+
+          <p>
+            Treating the extracted folder like a forensic file tree made sense
+            since the challenge explicitly mentioned an export of the laptop’s
+            files.
+          </p>
+
+          <hr />
+
+          <h2>2. Initial keyword searches</h2>
+
+          <pre><code class="language-bash">grep -ri "date" tabby_cdrive/
+grep -ri "flag" tabby_cdrive/
+</code></pre>
+
+          <p>
+            These came up empty because many Windows app artifacts are stored in
+            UTF-16 or binary formats.
+          </p>
+
+          <hr />
+
+          <h2>3. Inspecting Notepad TabState</h2>
+
+          <pre><code class="language-bash">cd C/Users/Tabby/AppData/Local/Packages/Microsoft.WindowsNotepad_8wekyb3d8bbwe/LocalState/TabState/
+</code></pre>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/tabby/tabstate-folder.png"
+              alt="TabState directory listing"
+            />
+            <figcaption>
+              Unsaved Notepad tabs stored as UUID-named .bin files.
+            </figcaption>
+          </figure>
+
+          <p>
+            Modern Windows Notepad stores unsaved tab state here, making this
+            directory the perfect place to look.
+          </p>
+
+          <hr />
+
+          <h2>4. Extracting readable text</h2>
+
+          <pre><code class="language-bash">file *.bin
+strings *.bin | less
+</code></pre>
+
+          <figure>
+            <img src="/Cyb3Raya-Blog/Images/tabby/raw-strings.png" alt="Raw strings output" />
+            <figcaption>
+              Initial strings output revealed encoded text.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>5. UTF-16 decoding</h2>
+
+          <pre><code class="language-bash">for f in *.bin; do
+  echo "=== $f ==="
+  iconv -f UTF-16LE -t UTF-8 "$f" 2>/dev/null \
+    || iconv -f UTF-16BE -t UTF-8 "$f" 2>/dev/null \
+    || strings "$f"
+done | less
+</code></pre>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/tabby/notepad.png"
+              alt="Decoded Notepad tab content"
+            />
+            <figcaption>
+              Clean UTF-8 output after decoding Notepad state files.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>6. Flag recovered</h2>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/tabby/flag.png"
+              alt="Recovered flag inside Notepad tab"
+            />
+            <figcaption>
+              Unsaved Notepad note containing the Wi-Fi password and flag.
+            </figcaption>
+          </figure>
+
+          <pre><code class="language-bash">flag{165d19b610c02b283fc1a6b4a54c4a58}
+</code></pre>
+
+          <hr />
+
+          <h2>Forensics takeaways</h2>
+
+          <ul>
+            <li>Unsaved data often lives in application state directories</li>
+            <li>Encoding matters when searching artifacts</li>
+            <li>Modern Windows apps leave rich forensic traces</li>
+            <li>Small artifacts can answer entire cases</li>
+          </ul>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/tabby/chall-complete.png"
+              alt="Challenge completion image"
+            />
+            <figcaption>
+              One unsaved Notepad tab, one recovered flag.
+            </figcaption>
+          </figure>
+        </article>
+      </section>
+    </main>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="image-modal" aria-hidden="true">
+      <button class="image-modal-close" aria-label="Close image">
+        &times;
+      </button>
+      <img src="" alt="" />
+    </div>
+
+    <footer class="footer">
+      &copy; 2025 AJ Raya. All rights reserved.
+      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+    </footer>
+
+    <!-- Theme toggle -->
+    <script>
+      const themeIcon = document.getElementById("theme-icon");
+      const storedTheme = localStorage.getItem("theme");
+
+      function enableDark() {
+        document.body.classList.add("dark-mode");
+        themeIcon.classList.replace("fa-sun", "fa-moon");
+      }
+
+      function enableLight() {
+        document.body.classList.remove("dark-mode");
+        themeIcon.classList.replace("fa-moon", "fa-sun");
+      }
+
+      if (
+        storedTheme === "dark" ||
+        (!storedTheme &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        enableDark();
+      } else {
+        enableLight();
+      }
+
+      themeIcon.addEventListener("click", () => {
+        document.body.classList.contains("dark-mode")
+          ? enableLight()
+          : enableDark();
+        localStorage.setItem(
+          "theme",
+          document.body.classList.contains("dark-mode") ? "dark" : "light"
+        );
+      });
+    </script>
+
+    <!-- Image zoom -->
+    <script>
+      (function () {
+        const modal = document.getElementById("image-modal");
+        const modalImg = modal.querySelector("img");
+        const closeBtn = modal.querySelector(".image-modal-close");
+
+        document.querySelectorAll(".post-container img").forEach((img) => {
+          img.addEventListener("click", () => {
+            modalImg.src = img.src;
+            modalImg.alt = img.alt || "";
+            modal.classList.add("open");
+            document.body.style.overflow = "hidden";
+          });
+        });
+
+        function close() {
+          modal.classList.remove("open");
+          modalImg.src = "";
+          document.body.style.overflow = "";
+        }
+
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target === closeBtn) close();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") close();
+        });
+      })();
+    </script>
+
+    <!-- Code copy buttons -->
+    <script>
+      document
+        .querySelectorAll(".post-container pre > code")
+        .forEach((code) => {
+          const pre = code.parentElement;
+          pre.classList.add("code-block");
+
+          const btn = document.createElement("button");
+          btn.className = "code-copy-btn";
+          btn.innerHTML =
+            '<i class="fa-regular fa-clipboard"></i><span>Copy</span>';
+
+          btn.onclick = async () => {
+            await navigator.clipboard.writeText(code.innerText);
+            btn.innerHTML =
+              '<i class="fa-solid fa-check"></i><span>Copied</span>';
+            setTimeout(() => {
+              btn.innerHTML =
+                '<i class="fa-regular fa-clipboard"></i><span>Copy</span>';
+            }, 1500);
+          };
+
+          pre.appendChild(btn);
+        });
+    </script>
+  </body>
+</html>

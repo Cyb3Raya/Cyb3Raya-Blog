@@ -1,0 +1,418 @@
+/* ========================================================================== */
+/*                              POST LAYOUT & TEXT                            */
+/* ========================================================================== */
+
+.post-container {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.post-container p {
+  margin: 0.5rem 0 1rem 0;
+}
+
+.post-container h1 {
+  margin-bottom: 0.75rem;
+}
+
+.post-container h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.post-container h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem;
+}
+
+/* ------------------------ Post Meta (Author + Date) ------------------------ */
+
+.post-meta {
+  margin: 0.5rem 0 1.5rem 0;
+  font-size: 0.95rem;
+  display: flex;
+  gap: 1.5rem;
+  color: var(--muted);
+}
+
+.post-meta i {
+  margin-right: 6px;
+  opacity: 0.8;
+}
+
+.dark-mode .post-meta {
+  color: #bdc7d8;
+}
+
+/* ---------------------- Category Row & Tag Pills --------------------------- */
+
+.blog-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.blog-meta-label {
+  font-weight: 500;
+  margin-right: 0.1rem;
+}
+
+.tags-line {
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.tag-pill {
+  display: inline-block;
+  margin: 0 0.25rem 0.25rem 0;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.02);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.category-pill {
+  font-weight: 600;
+}
+
+body.dark-mode .tag-pill {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ========================================================================== */
+/*               TAG PILLS – DARK PILL, LIME HOVER (LIGHT MODE)               */
+/* ========================================================================== */
+
+/* Light mode: dark pill + white text */
+body:not(.dark-mode) .tag-pill {
+  background: #14141f;
+  border-color: #333344;
+  color: #ffffff;
+}
+
+/* Category pill stays white too */
+body:not(.dark-mode) .category-pill {
+  color: #ffffff;
+}
+
+/* Hover: KEEP dark background, lime border + text */
+body:not(.dark-mode) .tag-pill:hover {
+  background: #14141f;               /* stays dark */
+  border-color: var(--accent-hover); /* lime */
+  color: var(--accent-hover);        /* lime text */
+}
+
+
+
+.tag-pill:hover {
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+  background: rgba(173, 255, 47, 0.03);
+}
+
+/* ========================================================================== */
+/*                             IMAGES & FIGURES                               */
+/* ========================================================================== */
+
+.post-container img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.75rem 0 1rem 0;
+  cursor: zoom-in;
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.post-container img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.post-container figure {
+  margin: 0.75rem 0 1.5rem 0;
+  text-align: center;
+}
+
+.post-container figure img {
+  display: block;
+  margin: 0 auto;
+}
+
+.post-container figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--muted);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* ========================================================================== */
+/*                        FULLSCREEN IMAGE MODAL                              */
+/* ========================================================================== */
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1000;
+}
+
+.image-modal.open {
+  display: flex;
+}
+
+.image-modal img {
+  max-width: min(100%, 1100px);
+  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  border: none;
+  background: rgba(15, 23, 42, 0.85);
+  color: #e5e7eb;
+  font-size: 2rem;
+  line-height: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-modal-close:hover {
+  background: rgba(15, 23, 42, 1);
+}
+
+/* ========================================================================== */
+/*                         CODE BLOCKS + COPY BUTTON                          */
+/* ========================================================================== */
+
+.post-container pre {
+  position: relative;
+  padding: 0.85rem 1rem;
+  padding-top: 2.3rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid #333;
+  background: #111;
+  margin: 0.75rem 0 1.25rem 0;
+}
+
+/* Inline + block code: font only */
+.post-container code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.9rem;
+}
+
+/* Code blocks only */
+.post-container pre code {
+  white-space: pre;
+}
+
+
+.code-copy-btn {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out,
+    background 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.code-copy-btn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  background: rgba(15, 23, 42, 1);
+  border-color: #6b7280;
+}
+
+.code-copy-btn.copied {
+  border-color: #22c55e;
+  background: rgba(22, 163, 74, 0.12);
+  color: #bbf7d0;
+}
+
+/* ========================================================================== */
+/*                        INLINE CODE / SMALL STYLES                           */
+/* ========================================================================== */
+
+.inside-code {
+  color: red;
+}
+
+/* ========================================================================== */
+/*                         INLINE LINK STYLING                                */
+/* ========================================================================== */
+
+/* ----------- MITRE tactic/technique links ----------- */
+
+.mitre-link {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent-color, #001aff);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(158, 252, 103, 0.45);
+  padding-bottom: 2px;
+  transition: all 0.25s ease;
+}
+
+.mitre-link:hover {
+  color: #7700ff;
+  border-bottom-color: #001aff;
+  text-shadow: 0 0 6px rgba(158, 252, 103, 0.6);
+}
+
+body.dark-mode .mitre-link {
+  color: #001aff;
+  border-bottom-color: rgba(158, 252, 103, 0.45);
+}
+
+body.light-mode .mitre-link {
+  color: #001aff;
+  border-bottom-color: rgba(68, 128, 58, 0.4);
+}
+
+/* ---------------- Generic variant: any-link ---------------- */
+
+.any-link {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent-color, #001aff);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(158, 252, 103, 0.45);
+  padding-bottom: 2px;
+  transition: all 0.25s ease;
+}
+
+.any-link:hover {
+  color: #7700ff;
+  border-bottom-color: #001aff;
+  text-shadow: 0 0 6px rgba(158, 252, 103, 0.6);
+}
+
+body.dark-mode .any-link {
+  color: #001aff;
+  border-bottom-color: rgba(158, 252, 103, 0.45);
+}
+
+body.light-mode .any-link {
+  color: #001aff;
+  border-bottom-color: rgba(68, 128, 58, 0.4);
+}
+
+/* ---------------- API Inline Links ---------------- */
+
+.api-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  text-decoration: none;
+  border: 1px solid rgba(173, 255, 47, 0.45);
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--accent);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+body.dark-mode .api-link {
+  background: #001aff;
+  color: var(--accent-contrast);
+}
+
+/* ---------------- API Simple Bold Links ---------------- */
+
+.api-simple {
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.api-simple:hover {
+  color: var(--accent-hover);
+}
+
+.dark-mode .api-simple {
+  color: #001aff;
+}
+
+.dark-mode .api-simple:hover {
+  color: #001aff;
+}
+
+
+/* Accessibility helpers */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.75rem;
+  z-index: 9999;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus,
+.skip-link:active {
+  left: 0.75rem;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Make the theme toggle feel like a real control when keyboarding */
+.theme-toggle[role="button"] {
+  cursor: pointer;
+}
+
+.theme-toggle[role="button"]:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 10px;
+}

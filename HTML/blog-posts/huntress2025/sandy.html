@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SANDY - Crypto Wallet Stealer Analysis</title>
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/blog.css" />
+
+    <!-- Prism (syntax highlighting) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A"
+      crossorigin="anonymous"
+    />
+
+    <!-- Font Awesome (icons) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+
+    <!-- Prism.js -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-06z5D//U/xpvxZHuUz92xBvq3DqBBFi7Up53HRrbV7Jlv7Yvh/MZ7oenfUe9iCEt"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-HkMr0bZB9kBW4iVtXn6nd35kO/L/dQtkkUBkL9swzTEDMdIe5ExJChVDSnC79aNA"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-powershell.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-xbI9krqyYp4npK9Cn94XyNoSR+TYZKddrk0NUVZ44zZ+OVpKz/LL0U1PB0MjR7Vx"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <!-- Accessibility -->
+    <!-- <a href="#content" class="skip-link">Skip to content</a> -->
+
+    <header>
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Primary">
+        <div class="navbar-inner">
+          <div class="logo">
+            <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+          </div>
+
+          <ul class="nav-links">
+            <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
+            <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
+            <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+            <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+          </ul>
+
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="content">
+      <section class="section">
+        <article class="post-container">
+          <h1>🐞 SANDY: Crypto Wallet Stealer Malware</h1>
+
+          <div class="post-meta">
+            <span class="author"><i class="fa-solid fa-user"></i> AJ Raya</span>
+            <span class="date"
+              ><i class="fa-solid fa-calendar"></i> October 3, 2025</span
+            >
+          </div>
+
+          <div class="blog-meta-row">
+            <span class="blog-meta-label">Category:</span>
+            <a
+              href="/Cyb3Raya-Blog/categories.html#malware-analysis"
+              class="tag-pill category-pill"
+            >
+              Malware Analysis / Reverse Engineering
+            </a>
+          </div>
+
+          <p class="muted tags-line">
+            Tags:
+            <a href="/Cyb3Raya-Blog/tags.html#huntress-ctf-2025" class="tag-pill"
+              >Huntress CTF 2025</a
+            >
+            <a href="/Cyb3Raya-Blog/tags.html#autoit" class="tag-pill">AutoIt</a>
+            <a href="/Cyb3Raya-Blog/tags.html#upx" class="tag-pill">UPX</a>
+            <a href="/Cyb3Raya-Blog/tags.html#crypto-wallets" class="tag-pill"
+              >Crypto Wallets</a
+            >
+          </p>
+
+          <p class="muted">
+            A look at <code>SANDY.exe</code>, a packed AutoIt specimen that
+            unpacks into a crypto wallet stealer targeting browser extensions
+            and desktop wallets.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/cryptostealer.jpg"
+              alt="Stylized image representing malware targeting crypto wallets"
+            />
+            <figcaption>Image generated with Google Gemini</figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>1. Challenge Prompt</h2>
+          <p>
+            The story: my friend <strong>Sandy</strong> is “really into
+            cryptocurrencies” and wants to help protect my wallets. She shares a
+            bunch of Chrome extensions to manage them and then hands over a
+            “cool program” that supposedly adds extra protection so hackers
+            can’t mess with my wallets.
+          </p>
+          <p>
+            Of course, this is a CTF, so the question is: is Sandy actually
+            helping, or is this a wallet stealer pretending to be a safety tool?
+          </p>
+
+          <hr />
+
+          <h2>2. First Look: Download &amp; Basic Triage</h2>
+          <p>
+            The challenge provides an archive: <code>SANDY.zip</code>. After
+            extracting it, we’re left with a single file:
+            <code>SANDY.exe</code>.
+          </p>
+
+          <p>I started with the usual quick triage commands:</p>
+
+          <pre><code class="language-bash">cyberaya@ctf-mint:~/huntress2025/day3$ file SANDY.exe
+SANDY.exe: PE32 executable (GUI) Intel 80386, for MS Windows, UPX compressed, 3 sections
+
+cyberaya@ctf-mint:~/huntress2025/day3$ strings -n 8 SANDY.exe
+!This program cannot be run in DOS mode.
+MT@Dhjf2
+9$(b[t|h,
+\g is not followed by a
+n (optiona
+}stenNEWLI
+epeatina DEF;g
+6Bmo~ th
+7dr: pPv
+f UTF-8pde)|
+...
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+&lt;assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0"&gt;
+    &lt;assemblyIdentity
+        type="win32"
+        processorArchitecture="*"
+        version="3.0.0.0"
+        name="AutoIt3"
+    &lt;description&gt;AutoIt v3&lt;/description&gt;
+...
+KERNEL32.DLL
+ADVAPI32.dll
+COMCTL32.dll
+...
+VirtualProtect
+VirtualAlloc
+VirtualFree
+ExitProcess
+...</code></pre>
+
+          <p>
+            From just <code>file</code> and <code>strings</code> we already
+            know:
+          </p>
+          <ul>
+            <li>The binary is <strong>UPX packed</strong>.</li>
+            <li>
+              It contains metadata for <strong>AutoIt3</strong>, hinting that
+              there’s an embedded AutoIt script.
+            </li>
+            <li>
+              The imports include suspicious APIs like
+              <a
+                href="https://malapi.io/winapi/VirtualProtect"
+                target="_blank"
+                class="api-simple"
+                rel="noopener noreferrer"
+                referrerpolicy="no-referrer"
+                ><strong>VirtualProtect</strong></a
+              >,
+              <a
+                href="https://malapi.io/winapi/VirtualAlloc"
+                target="_blank"
+                class="api-simple"
+                rel="noopener noreferrer"
+                referrerpolicy="no-referrer"
+                ><strong>VirtualAlloc</strong></a
+              >, and
+              <a
+                href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-virtualfree"
+                target="_blank"
+                class="api-simple"
+                rel="noopener noreferrer"
+                referrerpolicy="no-referrer"
+                ><strong>VirtualFree</strong></a
+              >.
+            </li>
+          </ul>
+
+          <p>
+            To double-check the packing and confirm AutoIt, I also dropped the
+            file into
+            <a
+              href="https://github.com/horsicq/Detect-It-Easy"
+              target="_blank"
+              class="api-simple"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+              ><strong>Detect-It-Easy</strong></a
+            >.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/die.png"
+              alt="Detect-It-Easy showing SANDY.exe packed with UPX and AutoIt"
+            />
+            <figcaption>DIE confirming UPX packing and AutoIt.</figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>3. Unpacking the Sample with UPX</h2>
+          <p>
+            Since the sample is packed with UPX, the first move is to try a
+            clean unpack with the tool itself:
+          </p>
+
+          <pre><code class="language-bash">cyberaya@ctf-mint:~/huntress2025/day3$ upx -d SANDY.exe -o SANDY_unpacked.exe
+                       Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2024
+UPX 4.2.2       Markus Oberhumer, Laszlo Molnar &amp; John Reiser    Jan 3rd 2024
+
+        File size         Ratio      Format      Name
+   --------------------   ------   -----------   -----------
+    567872 &lt;-    342592   60.33%    win32/pe     SANDY_unpacked.exe</code></pre>
+
+          <p>
+            Re-running <code>file</code> on the unpacked sample confirms that
+            UPX is no longer present:
+          </p>
+
+          <pre><code class="language-bash">cyberaya@ctf-mint:~/huntress2025/day3$ file SANDY_unpacked.exe
+SANDY_unpacked.exe: PE32 executable (GUI) Intel 80386, for MS Windows, 4 sections</code></pre>
+
+          <p>
+            With the unpacked PE in hand, the next goal is to carve out the
+            embedded AutoIt script.
+          </p>
+
+          <hr />
+
+          <h2>4. Extracting the AutoIt Script</h2>
+          <p>
+            Knowing this is an AutoIt-based sample, I used
+            <a
+              href="https://github.com/nazywam/AutoIt-Ripper"
+              target="_blank"
+              class="api-simple"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+              ><strong>AutoIt-Ripper</strong></a
+            >
+            to recover the original script. I ran it in a Python virtual
+            environment:
+          </p>
+
+          <pre><code class="language-bash">(venv) cyberaya@ctf-mint:~/huntress2025/day3/AutoIt-Ripper/autoit_ripper$ \
+venv/bin/autoit-ripper /home/cyberaya/huntress2025/day3/SANDY_unpacked.exe output_dir
+INFO:root:The output directory doesn't exist, creating it
+INFO:root:Storing result in output_dir/script.au3</code></pre>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/ls.png"
+              alt="AutoIt-Ripper output showing script.au3 extracted"
+            />
+            <figcaption>
+              AutoIt-Ripper successfully extracting <code>script.au3</code>.
+            </figcaption>
+          </figure>
+
+          <p>
+            Now we can switch to static analysis on
+            <code>script.au3</code> using a text editor.
+          </p>
+
+          <hr />
+
+          <h2>5. Finding the Embedded Base64 Chunks</h2>
+          <p>
+            While scrolling through <code>script.au3</code>, a large block of
+            Base64-looking data stood out. It was stored in a variable named
+            <code>$base64Chunks</code> as multiple concatenated strings.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/b64chunks.png"
+              alt="AutoIt script showing long base64Chunks variable"
+            />
+            <figcaption>
+              Long Base64-style chunks assigned to <code>$base64Chunks</code>.
+            </figcaption>
+          </figure>
+
+          <p>
+            I copied the entire Base64 blob into CyberChef for cleaning and
+            decoding.
+          </p>
+
+          <hr />
+
+          <h2>6. Cleaning &amp; Decoding Layer 1 in CyberChef</h2>
+          <p>
+            The first step was to normalize the blob by stripping out extra
+            characters and whitespace. I used a CyberChef recipe that:
+          </p>
+          <ul>
+            <li>Removed ampersands (<code>&amp;</code>)</li>
+            <li>Removed quotes (<code>"</code>)</li>
+            <li>Removed underscores (<code>_</code>)</li>
+            <li>Removed whitespace</li>
+          </ul>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/chef.png"
+              alt="CyberChef view of cleaned base64 from base64Chunks"
+            />
+            <figcaption>
+              First round of cleaning in CyberChef leaves a long Base64 string.
+            </figcaption>
+          </figure>
+
+          <p>In a new CyberChef tab, I pasted that string and used:</p>
+          <ul>
+            <li><strong>From Base64</strong></li>
+            <li><strong>Remove whitespace</strong></li>
+            <li><strong>Remove null bytes</strong></li>
+          </ul>
+
+          <p>
+            The result was another layer of Base64-style content - a classic
+            multi-stage encoding pattern.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/chef2.png"
+              alt="CyberChef showing another layer of base64 data"
+            />
+            <figcaption>
+              After decoding once, we get more Base64 data to peel.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>7. Peeling More Layers - Toward the Payload</h2>
+          <p>I repeated the same process again in a fresh CyberChef tab:</p>
+          <ol>
+            <li>Paste the new blob.</li>
+            <li>Use <strong>From Base64</strong>.</li>
+            <li>Remove whitespace and null bytes.</li>
+          </ol>
+
+          <p>
+            This time, the output started to look much more structured.
+            Scrolling through the decoded text, I began to see JSON-like data
+            describing applications and browser extensions.
+          </p>
+
+          <pre><code class="language-bash">{"name":"Guarda-A","path":"Guarda"},{"name":"Armory-A","path":"Armory"},
+{"name":"DELTA-A","path":"DELTA"},{"name":"TREZOR-A","path":"TREZORBridge"},
+{"name":"Bitcoin-A","path":"Bitcoin"},{"name":"binance-A","path":"binance"},
+{"name":"mexc-A","path":"mexc"}]},{"root":"%localappdata%","targets":[
+{"name":"Blockstream-A","path":"BlockstreamGreen"},{"name":"Coinomi-A","path":"Coinomi"}]},
+{"root":"%localappdata%\\Google\\Chrome\\UserData\\Default\\Extensions","targets":[
+{"name":"Metamask-C","path":"nkbihfbeogaeaoehlefnkodbefgpgknn"},
+{"name":"MEWcx-C","path":"nlbmnnijcnlegkjjpcfjclmcfggfefdm"}]</code></pre>
+
+          <p>
+            At this point it’s crystal clear: the malware is enumerating a long
+            list of <strong>crypto wallets and browser extensions</strong>. This
+            isn’t “extra protection” - it’s a wallet stealer.
+          </p>
+
+          <hr />
+
+          <h2>8. Finding the Flag</h2>
+          <p>
+            Continuing to scroll through the decoded content, I eventually
+            spotted a familiar key/value pair buried near the end of the
+            structure:
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/chef3.png"
+              alt="CyberChef output showing the flag JSON entry"
+            />
+            <figcaption>
+              Flag embedded in the JSON-like configuration.
+            </figcaption>
+          </figure>
+
+          <pre><code class="language-bash">{"name":"Flag","path":"flag{27768419fd176648b335aa92b8d2dab2}"}]},</code></pre>
+
+          <p>
+            The final CTF flag is:
+            <code>flag{27768419fd176648b335aa92b8d2dab2}</code>.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/sandy/chall-prompt.png"
+              alt="Screenshot of the flag submitted"
+            />
+            <figcaption>Flag submitted successfully.</figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>9. Behavioral Summary</h2>
+          <p>
+            While the challenge focuses on static extraction, we can infer the
+            high-level behavior of SANDY from the decoded configuration and file
+            paths:
+          </p>
+          <ul>
+            <li>
+              Targets both <strong>desktop crypto wallets</strong> (e.g. Guarda,
+              Armory, Coinomi) and
+              <strong>Chrome-based wallet extensions</strong>
+              (e.g. MetaMask, Phantom, Trust Wallet, Binance, Coinbase, etc.).
+            </li>
+            <li>
+              Likely searches in <code>%localappdata%</code> and
+              <code
+                >%localappdata%\Google\Chrome\UserData\Default\Extensions</code
+              >
+              to locate wallet data and extension directories.
+            </li>
+            <li>
+              Once located, it can exfiltrate wallet data, seed phrases, or
+              configuration information back to the attacker.
+            </li>
+          </ul>
+
+          <p>
+            The social-engineering story (“Sandy is protecting your wallets”) is
+            the lure; the underlying behavior is straight-up theft.
+          </p>
+
+          <hr />
+
+          <h2>10. Defensive Notes (If This Were Real)</h2>
+          <p>
+            In a real environment, a sample like this would be treated as a
+            serious compromise involving potential financial loss. A few
+            high-level points:
+          </p>
+          <ul>
+            <li>
+              <strong>User training:</strong> wallet “security tools” and random
+              crypto utilities are high-risk - only install from trusted
+              sources.
+            </li>
+            <li>
+              <strong>Application control:</strong> restrict execution of
+              unsigned binaries or unapproved tools, especially on endpoints
+              used for financial activity.
+            </li>
+            <li>
+              <strong>Browser extension hygiene:</strong> review installed
+              extensions regularly and keep only what’s necessary.
+            </li>
+            <li>
+              <strong>Telemetry:</strong> watch for processes enumerating wallet
+              directories and browser extension paths at scale.
+            </li>
+          </ul>
+
+          <p>
+            For the CTF, the key wins were recognizing UPX + AutoIt, unpacking,
+            ripping the script, peeling Base64 layers, and exposing the
+            configuration and embedded flag.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <!-- Fullscreen image modal -->
+    <div class="image-modal" id="image-modal" aria-hidden="true">
+      <button class="image-modal-close" aria-label="Close image">
+        &times;
+      </button>
+      <img src="" alt="" />
+    </div>
+
+    <footer class="footer">
+      <span>&copy; 2025 AJ Raya. All rights reserved.</span>
+      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+    </footer>
+
+    <!-- Theme toggle (keyboard friendly) -->
+    <script>
+      const themeToggle = document.querySelector(".theme-toggle");
+      const themeIcon = document.getElementById("theme-icon");
+      const storedTheme = localStorage.getItem("theme");
+
+      if (themeToggle && themeIcon) {
+        function enableDark() {
+          document.body.classList.add("dark-mode");
+          themeIcon.classList.replace("fa-sun", "fa-moon");
+        }
+
+        function enableLight() {
+          document.body.classList.remove("dark-mode");
+          themeIcon.classList.replace("fa-moon", "fa-sun");
+        }
+
+        if (
+          storedTheme === "dark" ||
+          (!storedTheme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          enableDark();
+        } else {
+          enableLight();
+        }
+
+        function toggleTheme() {
+          if (document.body.classList.contains("dark-mode")) {
+            enableLight();
+            localStorage.setItem("theme", "light");
+          } else {
+            enableDark();
+            localStorage.setItem("theme", "dark");
+          }
+        }
+
+        themeToggle.addEventListener("click", toggleTheme);
+        themeToggle.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleTheme();
+          }
+        });
+      }
+    </script>
+
+    <!-- Image click-to-zoom modal -->
+    <script>
+      (function () {
+        const modal = document.getElementById("image-modal");
+        if (!modal) return;
+
+        const modalImg = modal.querySelector("img");
+        const closeBtn = modal.querySelector(".image-modal-close");
+
+        function openModal(src, alt) {
+          modalImg.src = src;
+          modalImg.alt = alt || "";
+          modal.classList.add("open");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+          modal.classList.remove("open");
+          modal.setAttribute("aria-hidden", "true");
+          modalImg.src = "";
+          document.body.style.overflow = "";
+        }
+
+        document.querySelectorAll(".post-container img").forEach((img) => {
+          img.addEventListener("click", () => openModal(img.src, img.alt));
+        });
+
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target === closeBtn) closeModal();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.classList.contains("open"))
+            closeModal();
+        });
+      })();
+    </script>
+
+    <!-- Code block copy buttons -->
+    <script>
+      (function () {
+        const codeBlocks = document.querySelectorAll(
+          ".post-container pre > code"
+        );
+        if (!codeBlocks.length) return;
+
+        codeBlocks.forEach((code) => {
+          const pre = code.parentElement;
+          if (!pre) return;
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "code-copy-btn";
+          btn.innerHTML = `
+            <i class="fa-regular fa-clipboard"></i>
+            <span>Copy</span>
+          `;
+
+          btn.addEventListener("click", async () => {
+            const text = code.innerText || code.textContent || "";
+
+            const copy = async () => {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+              }
+
+              const textarea = document.createElement("textarea");
+              textarea.value = text;
+              textarea.style.position = "fixed";
+              textarea.style.left = "-9999px";
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+              } finally {
+                document.body.removeChild(textarea);
+              }
+            };
+
+            try {
+              await copy();
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-check"></i>
+                <span>Copied</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 1500);
+            } catch (err) {
+              console.error("Copy failed:", err);
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Error</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 2000);
+            }
+          });
+
+          pre.appendChild(btn);
+        });
+      })();
+    </script>
+  </body>
+</html>

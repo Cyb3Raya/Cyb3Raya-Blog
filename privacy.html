@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/Cyb3Raya-Blog/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy</title>
+
+    <!-- Basic hardening for a static site -->
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="/Cyb3Raya-Blog/CSS/style.css" />
+    <!-- External CDN dependency: common, but it's a supply chain risk.
+         If you want, we can self-host this or add SRI integrity later. -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <!-- Accessibility: lets keyboard users jump past the nav to main content -->
+    <a href="#content" class="skip-link main-link">Skip to content</a>
+
+    <header>
+      <!-- Navbar (matches your site structure) -->
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Primary">
+        <div class="navbar-inner">
+          <div class="logo">
+            <a href="/Cyb3Raya-Blog/index.html">CYB3R4Y4</a>
+          </div>
+
+          <ul class="nav-links">
+            <li><a href="/Cyb3Raya-Blog/blog.html">Blog</a></li>
+            <li><a href="/Cyb3Raya-Blog/tags.html">Tags</a></li>
+            <li><a href="/Cyb3Raya-Blog/categories.html">Categories</a></li>
+            <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+          </ul>
+
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main content -->
+    <main id="content" class="section">
+      <div class="post-container">
+        <h1>Privacy Policy</h1>
+
+        <p>This is a personal blog created and maintained by AJ.</p>
+
+        <h2>What this site collects</h2>
+        <p>
+          This site is made up of static pages and does not collect personal
+          information through forms, accounts, logins, or user profiles.
+        </p>
+
+        <h2>Cookies and tracking</h2>
+        <p>
+          This site does not use analytics, tracking scripts, advertising
+          pixels, or marketing tools. It does not intentionally set cookies in
+          your browser.
+        </p>
+
+        <h2>External links</h2>
+        <p>
+          This site may include links to third-party websites (for example,
+          Twitter/X, GitHub, or other resources). If you click an external link,
+          you leave this site and are subject to that third party’s privacy
+          practices and policies.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          If you have questions about this Privacy Policy, you can reach me at:
+          <a href="mailto:aj.raya@proton.me">aj.raya@proton.me</a>
+        </p>
+
+        <h2>Changes to this policy</h2>
+        <p>
+          If this site changes in a way that affects privacy (for example,
+          adding analytics, comments, embeds, or other third-party services),
+          this page will be updated.
+        </p>
+
+        <p class="post-meta">
+          Last updated: <time datetime="2025-12-13">December 13, 2025</time>
+        </p>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span>&copy; 2025 AJ Raya. All rights reserved.</span>
+      <a href="/Cyb3Raya-Blog/privacy.html">Privacy Policy</a>
+    </footer>
+  </body>
+</html>
