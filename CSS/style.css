@@ -726,3 +726,10 @@ body.dark-mode .tags-toc a:hover {
   display: block;       /* prevents baseline weirdness */
 }
 
+/* Featured article card image - keep it inside the card on mobile */
+.blog-post img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
