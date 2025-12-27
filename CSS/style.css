@@ -733,3 +733,13 @@ body.dark-mode .tags-toc a:hover {
   max-width: 100%;
   height: auto;
 }
+
+/* Prevent anything in the card from spilling out */
+.blog-post {
+  overflow: hidden;
+}
+
+/* Optional: make the image look nicer */
+.blog-post img {
+  border-radius: 12px;
+}
