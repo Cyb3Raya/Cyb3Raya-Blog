@@ -204,15 +204,16 @@ pre {
 }
 
 .social-icons a {
-  color: var(--icon-color);
+  color: #f36f21; /* orange */
   font-size: 2rem;
-  transition: color 0.3s ease, transform 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .social-icons a:hover {
-  color: var(--accent-hover);
+  color: #f36f21; /* stay orange */
   transform: scale(1.15);
 }
+
 
 /* Credly SVG sizing */
 .social-icons img {
