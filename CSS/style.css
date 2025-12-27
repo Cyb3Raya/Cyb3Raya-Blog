@@ -21,6 +21,7 @@ body {
   --bg: #f7f7f7;
   --text: #222;
   --muted: #000000;
+
   --card-bg: #ffffff;
   --card-border: #dddddd;
 
@@ -29,6 +30,10 @@ body {
   --accent-hover: #adff2f;
 
   --icon-color: #111111;
+
+  /* Link colors (used by .main-link) */
+  --link: #001aff;
+  --link-hover: #7700ff;
 }
 
 /* Dark mode overrides */
@@ -36,6 +41,7 @@ body.dark-mode {
   --bg: #050508;
   --text: #f1f1f1;
   --muted: #c2c2c2;
+
   --card-bg: #14141f;
   --card-border: #333344;
 
@@ -46,7 +52,10 @@ body.dark-mode {
   --icon-color: #f5f5f5;
 }
 
-/* Base body styling */
+/* ========================================================================== */
+/*                               GLOBAL BASE                                  */
+/* ========================================================================== */
+
 body {
   display: flex;
   flex-direction: column;
@@ -56,8 +65,29 @@ body {
   line-height: 1.6;
 }
 
+/* Screen-reader-only text (accessible name without visual clutter) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Generic pre style (outside blog.css post-container overrides) */
+pre {
+  text-align: left;
+  overflow-x: auto;
+  padding: 16px;
+  border-radius: 8px;
+}
+
 /* ========================================================================== */
-/*                               NAVBAR & HEADER                              */
+/*                               NAVBAR                                       */
 /* ========================================================================== */
 
 .navbar {
@@ -65,9 +95,8 @@ body {
   color: var(--accent-contrast);
 }
 
-/* Centered navbar content */
 .navbar-inner {
-  max-width: 900px;          /* MATCHES .section */
+  max-width: 900px; /* matches .section */
   margin: 0 auto;
   padding: 20px 40px;
 
@@ -110,22 +139,38 @@ body {
   color: var(--accent-hover);
 }
 
-/* Theme toggle */
+/* Theme toggle (single source of truth) */
 .theme-toggle {
-  background: none;
-  border: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  color: inherit;
   cursor: pointer;
+  line-height: 1;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   font-size: 1.4rem;
-  color: var(--accent-contrast);
 }
 
 .theme-toggle:hover {
   color: var(--accent-hover);
 }
 
+.theme-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
 
 /* ========================================================================== */
-/*                                 SECTIONS                                   */
+/*                               SECTIONS                                     */
 /* ========================================================================== */
 
 .section {
@@ -149,11 +194,12 @@ body {
   color: var(--muted);
 }
 
-/* Social icons */
+/* Social icons (single source of truth) */
 .social-icons {
   margin-top: 20px;
   display: flex;
   justify-content: center;
+  align-items: center; /* keeps svg aligned with font icons */
   gap: 25px;
 }
 
@@ -168,16 +214,31 @@ body {
   transform: scale(1.15);
 }
 
+/* Credly SVG sizing */
+.social-icons img {
+  width: 2rem;
+  height: 2rem;
+  display: block; /* avoids baseline alignment quirks */
+}
+
 /* ========================================================================== */
 /*                                  BLOG                                      */
 /* ========================================================================== */
 
-/* Blog section spacing tweak if I still want it tighter */
+/* Blog section spacing tweak */
 #blog.section {
   padding-top: 10px;
 }
 
-/* Blog cards (used on blog listing and elsewhere by default) */
+/* Blog card link wrapper */
+.blog-card-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Blog cards */
 .blog-post {
   display: block;
   background: var(--card-bg);
@@ -187,37 +248,15 @@ body {
   border: 1px solid var(--card-border);
 
   width: 100%;
-  max-width: 760px; /* change this for wider/narrower cards */
+  max-width: 760px; /* adjust for wider/narrower cards */
 }
 
 .blog-post h3 {
   margin-bottom: 10px;
 }
 
-/* Logo inside posts (e.g., Huntress logo) */
-.post-logo {
-  width: 200px;            /* adjust this size to fit my preference */
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 0 auto 15px auto; /* centers the logo + adds spacing below */
-}
-
-/* Blog card link wrapper */
-/* Blog card link wrapper */
-.blog-card-link {
-  display: block;
-  width: 100%;
-  text-decoration: none;
-  color: inherit;
-}
-
-
 .blog-card-link .blog-post {
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .blog-card-link:hover .blog-post {
@@ -226,14 +265,66 @@ body {
   border-color: var(--accent-hover);
 }
 
+/* Logo inside posts (eg Huntress logo) */
+.post-logo {
+  width: 200px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 15px;
+}
+
+/* "Read More" link styling */
+.main-link {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--link);
+  text-decoration: none;
+  padding-bottom: 2px;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.main-link:hover {
+  color: var(--link-hover);
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
 /* ========================================================================== */
-/*                HUNTRESS CTF 2025 – ALWAYS DARK CARDS                        */
+/*                     FEATURED ARTICLES (ALWAYS DARK CARDS)                  */
 /* ========================================================================== */
 
-/* Intro card (logo + description) */
+.featured-articles .blog-post {
+  background: #14141f;
+  border-color: #333344;
+  color: #f1f1f1;
+
+  overflow: hidden; /* prevents image overflow */
+}
+
+.featured-articles .blog-post p {
+  color: #c2c2c2;
+}
+
+.featured-articles .blog-post h3 {
+  color: #f1f1f1;
+}
+
+/* Featured image responsiveness (scoped so it won't surprise other pages) */
+.featured-articles .blog-post img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* ========================================================================== */
+/*                HUNTRESS CTF 2025 - ALWAYS DARK CARDS                        */
+/* ========================================================================== */
+
 .huntress-archive .blog-post {
-  background: #14141f;        /* dark-mode card bg */
-  border-color: #333344;      /* dark-mode card border */
+  background: #14141f;
+  border-color: #333344;
   color: #f1f1f1;
 }
 
@@ -241,7 +332,6 @@ body {
   color: #c2c2c2;
 }
 
-/* Logo polish on dark bg */
 .huntress-archive .post-logo {
   filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6));
 }
@@ -250,6 +340,56 @@ body {
 /*                         CHALLENGE GRID CARDS                               */
 /* ========================================================================== */
 
+.challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
+}
+
+/* Make the entire card clickable without breaking layout */
+.challenge-card-link {
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Card styling with consistent height behavior */
+.challenge-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 20px;
+  border-radius: 10px;
+
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+/* Reserve space so 1-line and 2-line titles align */
+.challenge-card h2 {
+  margin-bottom: 6px;
+  min-height: 3.2rem;
+}
+
+.challenge-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* Hover effect */
+.challenge-card-link:hover .challenge-card {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  border-color: var(--accent-hover);
+}
+
+/* Huntress grid cards forced dark */
 .huntress-archive .challenge-card {
   background: #14141f;
   border-color: #333344;
@@ -260,153 +400,34 @@ body {
   color: #c2c2c2;
 }
 
-/* Hover stays consistent */
 .huntress-archive .challenge-card-link:hover .challenge-card {
   transform: translateY(-4px);
   box-shadow: 0 0 18px rgba(173, 255, 47, 0.35);
   border-color: var(--accent-hover);
 }
 
-
 /* ========================================================================== */
-/*                    YEAR ARCHIVE (2025) – ALWAYS DARK CARDS                 */
+/*                    YEAR ARCHIVE (2025) - ALWAYS DARK CARDS                 */
 /* ========================================================================== */
 
 .year-archive .blog-post {
-  background: #14141f;        /* dark-mode card background */
-  border-color: #333344;      /* dark-mode card border */
-  color: #f1f1f1;             /* dark-mode text */
+  background: #14141f;
+  border-color: #333344;
+  color: #f1f1f1;
 }
 
-/* Titles inside year archive cards */
 .year-archive .blog-post h3 {
   color: #f1f1f1;
 }
 
-/* Optional: keep logos looking clean on dark bg */
 .year-archive .post-logo {
   filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6));
 }
 
-/* Hover behavior stays consistent with featured cards */
 .year-archive .blog-card-link:hover .blog-post {
   transform: translateY(-4px);
   box-shadow: 0 0 18px rgba(173, 255, 47, 0.35);
   border-color: var(--accent-hover);
-}
-
-
-/* ========================================================================== */
-/*                     FEATURED ARTICLES (ALWAYS DARK CARDS)                  */
-/* ========================================================================== */
-
-.featured-articles .blog-post {
-  background: #14141f;        /* matches your dark-mode --card-bg */
-  border-color: #333344;      /* matches your dark-mode --card-border */
-  color: #f1f1f1;             /* matches your dark-mode --text */
-}
-
-.featured-articles .blog-post p {
-  color: #c2c2c2;             /* matches your dark-mode --muted */
-}
-
-/* If you want titles to stay bright too */
-.featured-articles .blog-post h3 {
-  color: #f1f1f1;
-}
-
-
-/* ========================================================================== */
-/*                     TAGS & CATEGORIES – SPECIAL CARDS                      */
-/* ========================================================================== */
-
-/* Shared card styling for Tags & Categories pages */
-.tags-section .blog-post,
-.categories-section .blog-post {
-  border-radius: 12px;
-  background: #0d0d0f; /* solid dark background */
-  color: #f5f5f7;      /* high-contrast light text */
-  border: 1px solid #2b2b31;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-  padding: 25px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
-
-  /* Layout consistency */
-  width: 100%;
-  max-width: 760px;
-  margin: 20px auto 0;
-}
-
-
-/* Softer muted text inside cards */
-.tags-section .blog-post .muted,
-.categories-section .blog-post .muted {
-  color: #c8c8d0;
-}
-
-/* Hover: subtle lift + lime outline */
-.tags-section .blog-post:hover,
-.categories-section .blog-post:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent-hover);
-  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.55);
-  background: #121217; /* slightly lighter on hover */
-}
-
-/* Remove bullets */
-.tags-section .blog-post ul,
-.categories-section .blog-post ul {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 0.75rem;
-}
-
-/* Spacing between links */
-.tags-section .blog-post li + li,
-.categories-section .blog-post li + li {
-  margin-top: 0.35rem;
-}
-
-/* Links inside tag/category cards */
-.tags-section .blog-post a,
-.categories-section .blog-post a {
-  color: #e8e8e8; /* readable white/grey */
-  text-decoration: none;
-  border-bottom: 1px dashed rgba(173, 255, 47, 0.55);
-  padding-bottom: 1px;
-  transition:
-    color 0.15s ease,
-    border-bottom-color 0.15s ease;
-}
-
-/* No purple visited state */
-.tags-section .blog-post a:visited,
-.categories-section .blog-post a:visited {
-  color: #e8e8e8;
-}
-
-/* Hover lime accent */
-.tags-section .blog-post a:hover,
-.categories-section .blog-post a:hover {
-  color: var(--accent-hover);
-  border-bottom-color: var(--accent-hover);
-}
-
-/* ========================================================================== */
-/*                               FOOTER                                       */
-/* ========================================================================== */
-
-.footer {
-  margin-top: auto;
-  text-align: center;
-  padding: 20px;
-  background: var(--accent);
-  color: var(--accent-contrast);
-  font-size: 0.9rem;
 }
 
 /* ========================================================================== */
@@ -440,162 +461,88 @@ body {
   color: var(--accent-hover);
 }
 
-/* ========================================================================== */
-/*                   BLOG LANDING – ALWAYS DARK YEAR CARDS                    */
-/* ========================================================================== */
-
+/* Blog landing - always dark year cards */
 .blog-landing .year-card {
-  background: #14141f;        /* same as dark-mode --card-bg */
-  border-color: #333344;      /* same as dark-mode --card-border */
-  color: #f1f1f1;             /* same as dark-mode --text */
+  background: #14141f;
+  border-color: #333344;
+  color: #f1f1f1;
 }
 
-/* Subtext inside cards */
 .blog-landing .year-card p {
-  color: #c2c2c2;             /* same as dark-mode --muted */
+  color: #c2c2c2;
 }
 
-/* Hover stays consistent */
 .blog-landing .year-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 0 18px rgba(173, 255, 47, 0.35);
   border-color: var(--accent-hover);
 }
 
-
-
 /* ========================================================================== */
-/*                     HUNTRESS CTF – CHALLENGE GRID                          */
+/*                     TAGS & CATEGORIES - SPECIAL CARDS                      */
 /* ========================================================================== */
 
-.challenge-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-  margin-top: 25px;
+.tags-section .blog-post,
+.categories-section .blog-post {
+  border-radius: 12px;
+  background: #0d0d0f;
+  color: #f5f5f7;
+  border: 1px solid #2b2b31;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  padding: 25px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+
+  width: 100%;
+  max-width: 760px;
+  margin: 20px auto 0;
 }
 
-/* Make the entire card clickable without breaking layout */
-.challenge-card-link {
-  display: block;
-  height: 100%;
-  text-decoration: none;
-  color: inherit;
+.tags-section .blog-post .muted,
+.categories-section .blog-post .muted {
+  color: #c8c8d0;
 }
 
-/* Card styling with consistent height behavior */
-.challenge-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  padding: 20px;
-  border-radius: 10px;
-
-  /* Force consistent card heights */
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    border-color 0.15s ease;
-}
-
-/* Reserve space so 1-line and 2-line titles align */
-.challenge-card h2 {
-  margin-bottom: 6px;
-  min-height: 3.2rem;
-}
-
-/* Meta text */
-.challenge-meta {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
-
-/* Hover effect for challenge cards */
-.challenge-card-link:hover .challenge-card {
+.tags-section .blog-post:hover,
+.categories-section .blog-post:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   border-color: var(--accent-hover);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.55);
+  background: #121217;
 }
 
-
-/* ========================================================================== */
-/*                         GENERIC PRE (NON-BLOG)                             */
-/* ========================================================================== */
-
-/* Generic pre style (outside blog.css post-container overrides) */
-pre {
-  text-align: left;
-  overflow-x: auto;
-  padding: 16px;
-  border-radius: 8px;
+.tags-section .blog-post ul,
+.categories-section .blog-post ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.75rem;
 }
 
+.tags-section .blog-post li + li,
+.categories-section .blog-post li + li {
+  margin-top: 0.35rem;
+}
 
-/* ========================================================================== */
-/*                        BLOG LANDING PAGE IMAGE                             */
-/* ========================================================================== */
-.punk-blogger {
-  width: 250px;
-  height: auto;
-  display: block;
-  margin: 20px auto;
-  }
-
-  /* ---------------- Generic variant: any-link ---------------- */
-
-.main-link {
-  font-style: italic;
-  font-weight: 500;
-  color: var(--accent-color, #001aff);
+.tags-section .blog-post a,
+.categories-section .blog-post a {
+  color: #e8e8e8;
   text-decoration: none;
-  /* border-bottom: 1px dashed rgb(255, 255, 255); */
-  padding-bottom: 2px;
-  transition: all 0.25s ease;
+  border-bottom: 1px dashed rgba(173, 255, 47, 0.55);
+  padding-bottom: 1px;
+  transition: color 0.15s ease, border-bottom-color 0.15s ease;
 }
 
-.main-link:hover {
-  color: #7700ff;
-  /* border-bottom-color: #001aff; */
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+.tags-section .blog-post a:visited,
+.categories-section .blog-post a:visited {
+  color: #e8e8e8;
 }
 
-body.dark-mode .main-link {
-  color: #001aff;
-  /* border-bottom-color: rgb(255, 255, 255); */
+.tags-section .blog-post a:hover,
+.categories-section .blog-post a:hover {
+  color: var(--accent-hover);
+  border-bottom-color: var(--accent-hover);
 }
 
-body.dark-mode .main-link:hover {
-  color: #7700ff; /* purple */
-  /* border-bottom-color: #001aff; */
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-}
-
-body.light-mode .main-link {
-  color: #001aff;
-  /* border-bottom-color: rgba(0, 0, 0, 0.4); */
-}
-
-/* Screen-reader-only text (accessible name without visual clutter) */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* ========================================================================== */
-/*                          TAGS PAGE STYLING                                 */
-/* ========================================================================== */
+/* Tags table of contents */
 .tags-toc {
   margin: 20px auto 30px;
   max-width: 760px;
@@ -610,26 +557,18 @@ body.light-mode .main-link {
   padding: 0;
 }
 
+/* Light mode: black */
 .tags-toc a {
   text-decoration: none;
   font-size: 0.9rem;
-  color: var(--accent-hover);
+  color: #000000;
 }
 
-/* .tags-toc a:hover {
-  /* text-decoration: underline; */
-/* } */
-
-/* ========================================================================== */
-/*                     TAGS TOC – THEME-AWARE COLORS                          */
-/* ========================================================================== */
-
-/* Light mode: blood orange */
-.tags-toc a {
-  color: #000000; /* blood orange */
+.tags-toc a:hover {
+  color: purple;
 }
 
-/* Dark mode: lime green (existing accent) */
+/* Dark mode: lime */
 body.dark-mode .tags-toc a {
   color: var(--accent-hover);
 }
@@ -638,37 +577,33 @@ body.dark-mode .tags-toc a:hover {
   color: purple;
 }
 
-/* Hover (works in both modes) */
-.tags-toc a:hover {
-  color: purple;
-}
+/* ========================================================================== */
+/*                        BLOG LANDING PAGE IMAGE                             */
+/* ========================================================================== */
 
-/* Reset default button styling so it looks like your old icon-only toggle */
-.theme-toggle {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  appearance: none;
-  -webkit-appearance: none;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Optional: nicer keyboard focus without changing layout */
-.theme-toggle:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 4px;
-  border-radius: 8px;
+.punk-blogger {
+  width: 250px;
+  height: auto;
+  display: block;
+  margin: 20px auto;
 }
 
 /* ========================================================================== */
-/*                          RESPONSIVE DESIGN                                */
+/*                               FOOTER                                       */
+/* ========================================================================== */
+
+.footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 20px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.9rem;
+}
+
+/* ========================================================================== */
+/*                          RESPONSIVE DESIGN                                 */
+/* ========================================================================== */
 
 @media (max-width: 768px) {
   .navbar-inner {
@@ -692,54 +627,4 @@ body.dark-mode .tags-toc a:hover {
   #home p {
     font-size: 1.05rem;
   }
-}
-/* ========================================================================== */
-/*                          CREDLY SVG                                */
-
-.social-icons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center; /* 🔑 THIS fixes vertical alignment */
-  gap: 25px;
-}
-
-.social-icons a {
-  color: #f36f21; /* orange */
-  transition: transform 0.2s ease;
-    /* text-shadow:
-    -1px 0 0 #000,
-     1px 0 0 #000,
-     0 -1px 0 #000,
-     0  1px 0 #000; */
-}
-
-.social-icons a:hover {
-  color: #f36f21;          /* stays orange */
-  transform: scale(1.15); /* subtle feedback */
-}
-
-
-.social-icons img {
-  width: 2rem;
-  height: 2rem;
-  display: block;       /* prevents baseline weirdness */
-}
-
-/* Featured article card image - keep it inside the card on mobile */
-.blog-post img {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-}
-
-/* Prevent anything in the card from spilling out */
-.blog-post {
-  overflow: hidden;
-}
-
-/* Optional: make the image look nicer */
-.blog-post img {
-  border-radius: 12px;
 }
