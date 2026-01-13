@@ -107,14 +107,6 @@
             <a href="/tags.html#php" class="tag-pill">php</a>
           </p>
 
-          <!-- Optional: wrap standalone images in <figure> for semantics -->
-          <figure>
-            <img
-              src="/Images/for-greatness/malgal.png"
-              alt="For Greatness malware analysis image"
-            />
-          </figure>
-
           <figure>
             <img
               src="/Images/for-greatness/chall-prompt.png"
@@ -124,10 +116,10 @@
 
           <p>
             In this challenge, we are thrown into a bit of malware analysis. The
-            goal: <strong>find the email address that “they” send to</strong>.
-            As usual with CTF web shells and droppers, things are not in plain
-            text - the PHP script is heavily obfuscated and layered in multiple
-            stages of encoding and compression.
+            goal: find an email address. As usual with CTF web shells and
+            droppers, things are not in plain text - the PHP script is heavily
+            obfuscated and layered in multiple stages of encoding and
+            compression.
           </p>
 
           <!-- Replace <br><hr><br> with semantic section divider -->
@@ -473,60 +465,6 @@ Compressed: 129762
 
           <hr />
 
-          <h2>Malware analysis takeaways from this challenge</h2>
-
-          <ol>
-            <li>
-              <strong>Obfuscation tends to be layered, not singular.</strong
-              ><br />
-              This sample chained together escaped strings, Base64 encoding, and
-              zlib compression. Get comfortable building deobfuscation
-              <em>pipelines</em> instead of expecting a single transformation to
-              reveal everything.
-            </li>
-
-            <li>
-              <strong
-                >Encoding and compression signatures are your friends.</strong
-              ><br />
-              Magic bytes like <code class="inside-code">78 9C</code> (zlib) or
-              <code class="inside-code">1F 8B</code> (gzip) are strong hints
-              about the next step. Quickly checking hex can save you a lot of
-              guessing.
-            </li>
-
-            <li>
-              <strong
-                >Tools like CyberChef are perfect for quick IR triage.</strong
-              ><br />
-              Being able to interactively build recipes such as
-              <code class="inside-code"
-                >Unescape string → From Base64 → Zlib Inflate</code
-              >
-              speeds up analysis when you are under time pressure.
-            </li>
-
-            <li>
-              <strong>Look for exfil paths and infrastructure.</strong><br />
-              Even in obfuscated PHP, you can usually spot where data is going:
-              email addresses, URLs, API endpoints, or hard-coded C2 domains.
-              That is often where the flag - or the most actionable intel -
-              hides.
-            </li>
-
-            <li>
-              <strong
-                >Read the narrative of the code, not just the syntax.</strong
-              ><br />
-              Once deobfuscated, walk through the logic: What is being
-              collected? Where is it being sent? How is it triggered? Those
-              questions map nicely to real-world detections and threat-hunting
-              logic later.
-            </li>
-          </ol>
-
-          <hr />
-
           <h2>Related MITRE ATT&amp;CK techniques</h2>
 
           <p>
@@ -583,7 +521,7 @@ Compressed: 129762
     </div>
 
     <footer class="footer">
-      &copy; 2025 AJ Raya. All rights reserved.
+      &copy; 2026 Cyb3Raya. All rights reserved.
       <a href="/privacy.html">Privacy Policy</a>
     </footer>
 

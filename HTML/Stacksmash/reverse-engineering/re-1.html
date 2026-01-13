@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon_ico/favicon.ico" type="image/x-icon" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reversing An ELF 32-Bit Executable: RE-1</title>
+
+    <link rel="stylesheet" href="/CSS/style.css" />
+    <link rel="stylesheet" href="/CSS/blog.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
+      crossorigin="anonymous"
+    />
+
+    <!-- Prism.js -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      integrity="sha384-06z5D//U/xpvxZHuUz92xBvq3DqBBFi7Up53HRrbV7Jlv7Yvh/MZ7oenfUe9iCEt"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"
+      integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"
+      integrity="sha384-0zjJ3tR6dA0mQzJ7b7JvG0Cq6k7fVgVqgO9Qp8j8cYV0t7i2pK3C6bZp5zJwqv3B"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <header>
+      <!-- Navigation -->
+      <nav class="navbar" aria-label="Primary">
+        <div class="navbar-inner">
+          <div class="logo">
+            <a href="/index.html">CYB3R4Y4</a>
+          </div>
+
+          <ul class="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/blog.html">Blog</a></li>
+            <li><a href="/tags.html">Tags</a></li>
+            <li><a href="/categories.html">Categories</a></li>
+            <li><a href="mailto:aj.raya@proton.me">Contact</a></li>
+          </ul>
+
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            aria-label="Toggle theme"
+          >
+            <i id="theme-icon" class="fa-solid fa-sun" aria-hidden="true"></i>
+            <span class="sr-only">Toggle theme</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section" aria-labelledby="post-title">
+        <article class="post-container">
+          <h1 id="post-title">Reversing An ELF 32-Bit Executable: RE-1</h1>
+
+          <div class="post-meta" aria-label="Post metadata">
+            <span class="author">
+              <i class="fa-solid fa-user" aria-hidden="true"></i>
+              <address style="display: inline">AJ Raya</address>
+            </span>
+            <span class="date">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2026-01-13">January 6, 2026</time>
+            </span>
+          </div>
+
+          <div class="blog-meta-row" aria-label="Category">
+            <span class="blog-meta-label">Category:</span>
+            <a
+              href="/categories.html#reverse-engineering"
+              class="tag-pill category-pill"
+            >
+              Reverse Engineering
+            </a>
+          </div>
+
+          <p class="muted tags-line" aria-label="Tags">
+            Tags:
+            <a href="/tags.html#ghidra" class="tag-pill">ghidra</a>
+          </p>
+
+          <figure>
+            <img
+              src="/Images/stacksmash/RE/RE1/chall.png"
+              alt="Cover image for 'It’s All Just Trees' reverse engineering post"
+            />
+          </figure>
+
+          <blockquote>
+            <strong>TL;DR:</strong><br />
+            This was a pretty simple flag checker binary. I used
+            <code class="inside-code">file</code>,
+            <code class="inside-code">strings</code>, then popped it into Ghidra
+            and the flag was basically spelled out in the decompiler.
+          </blockquote>
+
+          <hr />
+
+          <h2>
+            1. Quick recon with <code class="inside-code">file</code> and
+            <code class="inside-code">strings</code>
+          </h2>
+
+          <p>
+            First thing I do with these is check the file type and see if
+            there’s any low-hanging fruit (like a flag sitting in plain text).
+          </p>
+
+          <pre><code class="language-bash">cyber@bun2:~/Stacksmash/RE$ file re-1
+re-1: ELF 32-bit LSB pie executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=b6619875228fde069ea88ae0f453f00e92fab0bc, for GNU/Linux 3.2.0, not stripped
+
+cyber@bun2:~/Stacksmash/RE$ strings re-1 | grep flag
+cyber@bun2:~/Stacksmash/RE$</code></pre>
+
+          <p>
+            So yeah - I learned what I’m dealing with (32-bit ELF), but the grep
+            didn’t return any immediate flags.
+          </p>
+
+          <hr />
+
+          <h2>2. Opening the binary in Ghidra</h2>
+
+          <p>
+            Next, I opened it up in Ghidra and jumped straight to
+            <code class="inside-code">main</code>.
+          </p>
+
+          <figure>
+            <img
+              src="/Images/stacksmash/RE/RE1/symbol-tree.png"
+              alt="Ghidra decompiler view of the main function"
+            />
+          </figure>
+          <figure>
+            <img
+              src="/Images/stacksmash/RE/RE1/main-funct.png"
+              alt="Ghidra decompiler view of the main function"
+            />
+            <figcaption>
+              Ghidra decompiler view of <code class="inside-code">main</code>.
+            </figcaption>
+          </figure>
+          <p>
+            In the decompiled pane I immediately saw it printing a prompt:
+            <code class="inside-code">printf("&gt; ");</code>
+          </p>
+
+          <p>
+            Then it reads user input with:
+            <code class="inside-code"
+              >__isoc99_scanf("%255s", &amp;local_114)</code
+            >
+            which means it reads up to 255 chars into a stack buffer.
+          </p>
+
+          <figure>
+            <img
+              src="/Images/stacksmash/RE/RE1/decompiled.png"
+              alt="Ghidra showing scanf call reading up to 255 bytes"
+            />
+            <figcaption>
+              The input is read using
+              <code class="inside-code">scanf("%255s", ...)</code>.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>3. The flag was literally in the comparisons</h2>
+
+          <p>
+            After the input read, the program compares my input against a
+            hardcoded value, but it does it
+            <strong>one character at a time</strong>. Each
+            <code class="inside-code">cStack_...</code> is just the next byte in
+            that stack buffer.
+          </p>
+
+          <p>
+            And once you stare at it for a second, it’s basically spelling out:
+            <strong>f l a g { b r a n c h e s _ i n _ t h e _ t r e e }</strong>
+          </p>
+
+          <figure>
+            <img
+              src="/Images/stacksmash/RE/RE1/decompiled2.png"
+              alt="Ghidra showing the character-by-character comparisons spelling out the flag"
+            />
+            <figcaption>
+              The comparisons spell out the full flag one byte at a time.
+            </figcaption>
+          </figure>
+
+          <p>
+            If every comparison matches, it prints a success message:
+            <code class="inside-code">"correct!"</code>
+          </p>
+
+          <figure>
+            <img
+              src="/Images/stacksmash/RE/RE1/correct.png"
+              alt="Ghidra showing the success message printed on a correct match"
+            />
+            <figcaption>
+              Success path prints <code class="inside-code">correct!</code>.
+            </figcaption>
+          </figure>
+
+          <hr />
+
+          <h2>4. Confirming by running the binary</h2>
+
+          <p>
+            At this point, I already knew the flag, but I ran the binary anyway
+            just to confirm.
+          </p>
+
+          <pre><code class="language-bash">cyber@bun2:~/Stacksmash/RE$ ./re-1
+
+&gt; flag{branches_in_the_tree}
+correct!
+&gt;</code></pre>
+
+          <hr />
+
+          <h2>Overall purpose</h2>
+
+          <p>
+            This function is a simple password-style flag checker. It prompts
+            for a single whitespace-delimited input string, then verifies it by
+            comparing each character against a hardcoded expected value (<code
+              class="inside-code"
+              >flag{branches_in_the_tree}</code
+            >). If the input matches exactly, it prints
+            <code class="inside-code">correct!</code> and exits normally.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <!-- Fullscreen image modal -->
+    <div
+      class="image-modal"
+      id="image-modal"
+      aria-hidden="true"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image preview"
+      tabindex="-1"
+    >
+      <button class="image-modal-close" type="button" aria-label="Close image">
+        &times;
+      </button>
+      <img src="" alt="" />
+    </div>
+
+    <footer class="footer">
+      &copy; 2026 Cyb3Raya. All rights reserved.
+      <a href="/privacy.html">Privacy Policy</a>
+    </footer>
+
+    <!-- Dark mode logic -->
+    <script>
+      const themeIcon = document.getElementById("theme-icon");
+      const themeToggle = document.getElementById("theme-toggle");
+      const storedTheme = localStorage.getItem("theme");
+
+      function setToggleState(isDark) {
+        if (themeToggle)
+          themeToggle.setAttribute("aria-pressed", String(isDark));
+      }
+
+      function enableDark() {
+        document.body.classList.add("dark-mode");
+        themeIcon.classList.replace("fa-sun", "fa-moon");
+        setToggleState(true);
+      }
+
+      function enableLight() {
+        document.body.classList.remove("dark-mode");
+        themeIcon.classList.replace("fa-moon", "fa-sun");
+        setToggleState(false);
+      }
+
+      if (
+        storedTheme === "dark" ||
+        (!storedTheme &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        enableDark();
+      } else {
+        enableLight();
+      }
+
+      if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+          if (document.body.classList.contains("dark-mode")) {
+            enableLight();
+            localStorage.setItem("theme", "light");
+          } else {
+            enableDark();
+            localStorage.setItem("theme", "dark");
+          }
+        });
+      }
+    </script>
+
+    <!-- Image zoom modal logic -->
+    <script>
+      (function () {
+        const modal = document.getElementById("image-modal");
+        if (!modal) return;
+
+        const modalImg = modal.querySelector("img");
+        const closeBtn = modal.querySelector(".image-modal-close");
+
+        function openModal(src, alt) {
+          modalImg.src = src;
+          modalImg.alt = alt || "";
+          modal.classList.add("open");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+          modal.focus();
+        }
+
+        function closeModal() {
+          modal.classList.remove("open");
+          modal.setAttribute("aria-hidden", "true");
+          modalImg.src = "";
+          document.body.style.overflow = "";
+        }
+
+        document.querySelectorAll(".post-container img").forEach((img) => {
+          img.addEventListener("click", () => {
+            openModal(img.src, img.alt);
+          });
+
+          img.setAttribute("tabindex", "0");
+          img.setAttribute("role", "button");
+          img.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openModal(img.src, img.alt);
+            }
+          });
+        });
+
+        modal.addEventListener("click", (e) => {
+          if (e.target === modal || e.target === closeBtn) {
+            closeModal();
+          }
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.classList.contains("open")) {
+            closeModal();
+          }
+        });
+      })();
+    </script>
+
+    <!-- Code block copy buttons -->
+    <script>
+      (function () {
+        const codeBlocks = document.querySelectorAll(
+          ".post-container pre > code"
+        );
+        if (!codeBlocks.length) return;
+
+        codeBlocks.forEach((code) => {
+          const pre = code.parentElement;
+          if (!pre) return;
+
+          pre.classList.add("code-block");
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "code-copy-btn";
+          btn.setAttribute("aria-label", "Copy code to clipboard");
+          btn.innerHTML = `
+            <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+            <span>Copy</span>
+          `;
+
+          btn.addEventListener("click", async () => {
+            const text = code.innerText || code.textContent || "";
+
+            const copy = async () => {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+              }
+
+              const textarea = document.createElement("textarea");
+              textarea.value = text;
+              textarea.style.position = "fixed";
+              textarea.style.left = "-9999px";
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+              } finally {
+                document.body.removeChild(textarea);
+              }
+            };
+
+            try {
+              await copy();
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-check" aria-hidden="true"></i>
+                <span>Copied</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+                  <span>Copy</span>
+                `;
+              }, 1500);
+            } catch (err) {
+              console.error("Copy failed:", err);
+              btn.classList.add("copied");
+              btn.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                <span>Error</span>
+              `;
+              setTimeout(() => {
+                btn.classList.remove("copied");
+                btn.innerHTML = `
+                  <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+                  <span>Copy</span>
+                `;
+              }, 2000);
+            }
+          });
+
+          pre.appendChild(btn);
+        });
+      })();
+    </script>
+  </body>
+</html>
