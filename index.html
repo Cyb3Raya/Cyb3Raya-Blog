@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -102,20 +102,21 @@
         <h2>Latest Featured Articles</h2>
 
         <a
-          href="/HTML/blog-posts/huntress2025/for-greatness.html"
+          href="/HTML/malware-analysis/js-dropper-to-lua-vm.html"
           class="blog-card-link"
         >
           <div class="blog-post">
-            <h3>For Greatness: Deobfuscating a PHP Backdoor</h3>
+            <h3>Sample Analysis: JS Dropper to Lua VM Loader</h3>
             <img
-              src="/Images/featured/art-running.gif"
+              src="/Images/js-lua-loader/overwatch.gif"
               alt="Featured Image"
               loading="lazy"
               width="480"
-              height="270"
+              height="262"
             />
             <p>
-              In this challenge, we are thrown into a bit of malware analysis ..
+              A JavaScript dropper that unpacks, in stages, to a Luraph-family
+              Lua VM loader, carved statically without ever running it ..
             </p>
             <span class="main-link">Read More</span>
           </div>
@@ -147,6 +148,7 @@
 
     <!-- Theme toggle script: localStorage only, no tracking/analytics -->
     <script>
+      const themeToggle = document.querySelector(".theme-toggle");
       const themeIcon = document.getElementById("theme-icon");
       const storedTheme = localStorage.getItem("theme");
 
@@ -173,8 +175,8 @@
         enableLight();
       }
 
-      // When icon clicked - toggle
-      themeIcon.addEventListener("click", () => {
+      // When toggle button clicked - toggle
+      themeToggle.addEventListener("click", () => {
         if (document.body.classList.contains("dark-mode")) {
           enableLight();
           localStorage.setItem("theme", "light");

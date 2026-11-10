@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Favicon -->
@@ -69,7 +69,12 @@
 
           <a href="/2026.html" class="year-card">
             <h2>2026</h2>
-            <p>This years posts!!</p>
+            <p>This year's posts!!</p>
+          </a>
+
+          <a href="/2027.html" class="year-card">
+            <h2>2027</h2>
+            <p>Coming Soon!</p>
           </a>
         </div>
       </section>
@@ -82,6 +87,7 @@
 
     <!-- Theme toggle script: localStorage only, no tracking/analytics -->
     <script>
+      const themeToggle = document.querySelector(".theme-toggle");
       const themeIcon = document.getElementById("theme-icon");
       const storedTheme = localStorage.getItem("theme");
 
@@ -108,9 +114,9 @@
         }
       }
 
-      // Toggle theme on click (safe if icon is missing)
-      if (themeIcon) {
-        themeIcon.addEventListener("click", () => {
+      // Toggle theme on click (listener on the button so the whole hit area works)
+      if (themeToggle && themeIcon) {
+        themeToggle.addEventListener("click", () => {
           if (document.body.classList.contains("dark-mode")) {
             enableLight();
             localStorage.setItem("theme", "light");

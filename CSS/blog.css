@@ -416,3 +416,45 @@ body.dark-mode .api-link {
   outline-offset: 3px;
   border-radius: 10px;
 }
+
+/* ========================================================================== */
+/*                               DATA TABLES                                  */
+/* ========================================================================== */
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 0.75rem 0 1.5rem 0;
+}
+
+.post-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: #14141f;
+  color: #f1f1f1;
+  border: 1px solid #333344;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.post-container th,
+.post-container td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #333344;
+  text-align: left;
+  vertical-align: top;
+}
+
+.post-container th {
+  background: #0d0d0f;
+  font-weight: 600;
+}
+
+.post-container tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Long hashes/paths wrap instead of blowing out the table */
+.post-container td code {
+  word-break: break-all;
+}

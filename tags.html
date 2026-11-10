@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Favicon -->
@@ -69,6 +69,11 @@
             <li><a href="#obfuscation">Obfuscation</a></li>
             <li><a href="#cyberchef">CyberChef</a></li>
             <li><a href="#php">PHP</a></li>
+            <li><a href="#newline-injection">Newline Injection</a></li>
+            <li><a href="#javascript">JavaScript</a></li>
+            <li><a href="#lua">Lua</a></li>
+            <li><a href="#luraph">Luraph</a></li>
+            <li><a href="#box-js">box-js</a></li>
           </ul>
         </nav>
 
@@ -76,7 +81,8 @@
         <div class="blog-post" id="ghidra">
           <h2>Ghidra</h2>
           <p class="muted">
-            Posts covering the use of Ghidra for reverse engineering and binary analysis.
+            Posts covering the use of Ghidra for reverse engineering and binary
+            analysis.
           </p>
 
           <ul>
@@ -86,8 +92,6 @@
               </a>
             </li>
           </ul>
-        </div>
-          </p>
         </div>
 
         <!-- ================= TAG: Huntress CTF 2025 ================= -->
@@ -306,6 +310,11 @@
                 Trashcan - Forensics in the Windows Recycle Bin
               </a>
             </li>
+            <li>
+              <a href="/HTML/malware-analysis/js-dropper-to-lua-vm.html">
+                Sample Analysis: JS Dropper to Lua VM Loader
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -321,6 +330,11 @@
             <li>
               <a href="/HTML/blog-posts/huntress2025/for-greatness.html">
                 For Greatness - Deobfuscating a PHP Backdoor
+              </a>
+            </li>
+            <li>
+              <a href="/HTML/malware-analysis/js-dropper-to-lua-vm.html">
+                Sample Analysis: JS Dropper to Lua VM Loader
               </a>
             </li>
           </ul>
@@ -359,6 +373,71 @@
             </li>
           </ul>
         </div>
+        <!-- ================= TAG: JavaScript ================= -->
+        <div class="blog-post" id="javascript">
+          <h2>JavaScript</h2>
+          <p class="muted">
+            Posts covering malicious JavaScript, WSH droppers, and script
+            deobfuscation.
+          </p>
+
+          <ul>
+            <li>
+              <a href="/HTML/malware-analysis/js-dropper-to-lua-vm.html">
+                Sample Analysis: JS Dropper to Lua VM Loader
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ================= TAG: Lua ================= -->
+        <div class="blog-post" id="lua">
+          <h2>Lua</h2>
+          <p class="muted">
+            Posts involving Lua-based malware, loaders, and Lua bytecode
+            analysis.
+          </p>
+
+          <ul>
+            <li>
+              <a href="/HTML/malware-analysis/js-dropper-to-lua-vm.html">
+                Sample Analysis: JS Dropper to Lua VM Loader
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ================= TAG: Luraph ================= -->
+        <div class="blog-post" id="luraph">
+          <h2>Luraph</h2>
+          <p class="muted">
+            Samples protected by Luraph-family Lua VM obfuscators.
+          </p>
+
+          <ul>
+            <li>
+              <a href="/HTML/malware-analysis/js-dropper-to-lua-vm.html">
+                Sample Analysis: JS Dropper to Lua VM Loader
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ================= TAG: box-js ================= -->
+        <div class="blog-post" id="box-js">
+          <h2>box-js</h2>
+          <p class="muted">
+            Posts that use box-js to emulate and analyze malicious JavaScript.
+          </p>
+
+          <ul>
+            <li>
+              <a href="/HTML/malware-analysis/js-dropper-to-lua-vm.html">
+                Sample Analysis: JS Dropper to Lua VM Loader
+              </a>
+            </li>
+          </ul>
+        </div>
       </section>
     </main>
 
@@ -369,6 +448,7 @@
 
     <!-- Theme toggle script  -->
     <script>
+      const themeToggle = document.querySelector(".theme-toggle");
       const themeIcon = document.getElementById("theme-icon");
       const storedTheme = localStorage.getItem("theme");
 
@@ -382,7 +462,7 @@
         themeIcon.classList.replace("fa-moon", "fa-sun");
       }
 
-      if (themeIcon) {
+      if (themeToggle && themeIcon) {
         if (
           storedTheme === "dark" ||
           (!storedTheme &&
@@ -393,7 +473,7 @@
           enableLight();
         }
 
-        themeIcon.addEventListener("click", () => {
+        themeToggle.addEventListener("click", () => {
           if (document.body.classList.contains("dark-mode")) {
             enableLight();
             localStorage.setItem("theme", "light");

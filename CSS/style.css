@@ -439,8 +439,9 @@ pre {
   display: flex;
   justify-content: center;
   gap: 30px;
-  margin-top: 40px;
+  margin: 40px auto 0;
   flex-wrap: wrap;
+  max-width: 520px; /* 2 cards per row (2 x 220px + 30px gap); last card centers below */
 }
 
 .year-card {
@@ -527,9 +528,7 @@ pre {
 .categories-section .blog-post a {
   color: #e8e8e8;
   text-decoration: none;
-  border-bottom: 1px dashed rgba(173, 255, 47, 0.55);
-  padding-bottom: 1px;
-  transition: color 0.15s ease, border-bottom-color 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .tags-section .blog-post a:visited,
@@ -540,7 +539,6 @@ pre {
 .tags-section .blog-post a:hover,
 .categories-section .blog-post a:hover {
   color: var(--accent-hover);
-  border-bottom-color: var(--accent-hover);
 }
 
 /* Tags table of contents */
