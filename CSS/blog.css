@@ -458,3 +458,78 @@ body.dark-mode .api-link {
 .post-container td code {
   word-break: break-all;
 }
+/* ========================================================================== */
+/*                     DEFAULT INLINE LINKS (UNCLASSED)                       */
+/* ========================================================================== */
+
+/* Any plain <a> in a post without its own class */
+.post-container a:not([class]) {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 26, 255, 0.35);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+.post-container a:not([class]):hover {
+  color: var(--link-hover);
+  text-decoration-color: currentColor;
+}
+
+body.dark-mode .post-container a:not([class]) {
+  color: #8fb3ff;
+  text-decoration-color: rgba(143, 179, 255, 0.35);
+}
+
+body.dark-mode .post-container a:not([class]):hover {
+  color: var(--accent-hover);
+  text-decoration-color: currentColor;
+}
+
+/* ========================================================================== */
+/*                  REPORT LINK BUTTON (sandbox / external refs)              */
+/* ========================================================================== */
+
+/* Always-dark pill button, matches tag pills and featured cards */
+.report-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.25rem 0 1rem 0;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #333344;
+  background: #14141f;
+  color: #f1f1f1;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.report-link .report-link-meta {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #9a9aab;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.report-link i {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.report-link:hover,
+.report-link:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
+  box-shadow: 0 0 14px rgba(173, 255, 47, 0.3);
+  outline: none;
+}
+
+.report-link:hover .report-link-meta,
+.report-link:focus-visible .report-link-meta {
+  color: #c8e88a;
+}
